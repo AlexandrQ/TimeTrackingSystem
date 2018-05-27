@@ -31,13 +31,13 @@
 				        <h:panelGrid columns="2" cellpadding="5">	        
 				        	 
 				            <h:outputLabel for="login" value="Login:" />
-				            <p:inputText id="login" value="#{user.login}" required="true" label="Login" />
+				            <p:inputText id="login" value="#{mainBean.user.login}" required="true" label="Login" />
 				 			
 				            <h:outputLabel for="password" value="Password:" />
-				            <p:password id="password" value="#{user.password}" required="true" label="password" />
+				            <p:password id="password" value="#{mainBean.user.password}" required="true" label="password" />
 				 
 				            <f:facet name="footer">			            
-				                <p:commandButton value="Login" styleClass="myCustomStyle" action="#{user.loggedIn()}" update="growl"/>				                				                
+				                <p:commandButton value="Login" styleClass="myCustomStyle" action="#{mainBean.loggedIn()}" update="growl"/>				                				                
 				            </f:facet> 
 				        </h:panelGrid>	
 			        </h:form> 	    

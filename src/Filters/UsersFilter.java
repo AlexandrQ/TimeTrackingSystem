@@ -14,7 +14,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import Beans.User;
+import Beans.MainBean;
 
 
 
@@ -36,12 +36,10 @@ public class UsersFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse resp = (HttpServletResponse) response;
-		User session = (User) req.getSession().getAttribute("user");
-		String url = req.getRequestURI();
-		Cookie cookie = null;
+		MainBean session = (MainBean) req.getSession().getAttribute("mainBean");
+		String url = req.getRequestURI();		
 		
-		
-		if (session == null || !session.isLogged()) {
+		if (session == null || !session.getUser().isLogged()) {
 			if(url.indexOf("/myActivity.xhtml") >= 0 || url.indexOf("/logout.xhtml") >= 0) {
 				resp.sendRedirect(req.getServletContext().getContextPath() + "/login.xhtml");
 			} else {
@@ -51,16 +49,12 @@ public class UsersFilter implements Filter {
 			if (url.indexOf("/register.xhtml") >= 0 || url.indexOf("/login.xhtml") >= 0) {
 				resp.sendRedirect(req.getServletContext().getContextPath() + "/myActivity.xhtml");
 			} else if(url.indexOf("/logout.xhtml") >= 0) {
-				req.getSession().removeAttribute("user");
+				req.getSession().removeAttribute("mainBean");
 				resp.sendRedirect(req.getServletContext().getContextPath() + "/login.xhtml");
 			} else {
 				chain.doFilter(request, response);
 			}
 		}
-		
-		
-		
-		
 	}
 
 	

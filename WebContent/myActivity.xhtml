@@ -47,44 +47,44 @@
 	 
 	 	<div><h:outputLabel value="Welcome to Hide Page!" /> </div>	   
 	   
-	   <div><h:outputLabel value="#{user.login}" /></div>
+	   <div><h:outputLabel value="#{mainBean.user.login}" /></div>
 	   
-	   <div><h:outputLabel value="Hidden label on hidden page! Only for admin :)" rendered="#{user.login == 'admin'}"/></div>
+	   <div><h:outputLabel value="Hidden label on hidden page! Only for admin :)" rendered="#{mainBean.user.login == 'admin'}"/></div>
 	   
 	   <p:panelGrid columns="2">
 	   		
-	   		<p:dataTable var="cost" value=""  >          		         		
+	   		<p:dataTable var="activity" value="#{mainBean.activitiesList}"  >          		         		
 	          	
 	          		<f:facet name="header">
 	            		MyTable
 	       			</f:facet>
 	          		
 					<p:column headerText="Date">	
-						<h:outputText value="Date" />		               				
+						<h:outputText value="#{activity.date}" />		               				
 					</p:column>
 					<p:column headerText="Activity type">	
-						<h:outputText value="Activity type" />
+						<h:outputText value="#{activity.type}" />
 					</p:column>
 					<p:column headerText="Proportion">
-						<h:outputText value="Proportion" />	 						
+						<h:outputText value="#{activity.proportion}" />	 						
 					</p:column>
 					<p:column headerText="Project">
-						<h:outputText value="Project" />	 						
+						<h:outputText value="#{activity.project}" />	 						
 					</p:column>	 	
 					<p:column headerText="Task Group">
-						<h:outputText value="Task Group" />	 						
+						<h:outputText value="#{activity.taskGroup}" />	 						
 					</p:column>	
 					<p:column headerText="Task">
-						<h:outputText value="Task" />	 						
+						<h:outputText value="#{activity.task}" />	 						
 					</p:column>	
 					<p:column headerText="Comment">
-						<h:outputText value="Comment" />	 						
+						<h:outputText value="#{activity.comment}" />	 						
 					</p:column>	
 					<p:column headerText="%">
-						<h:outputText value="%" />	 						
+						<h:outputText value="#{activity.percentage}" />	 						
 					</p:column>	
 					<p:column headerText="Status">
-						<h:outputText value="Status" />	 						
+						<h:outputText value="#{activity.status}" />	 						
 					</p:column>		
 					<p:column headerText="Button for approve here">
 						<h:outputText value="Button for approve here" />	 						
