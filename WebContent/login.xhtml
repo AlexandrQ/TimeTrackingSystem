@@ -1,0 +1,60 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml"	
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    >
+ 
+	<h:head>
+		<title>Login</title>
+		<style>
+			.myCustomStyle {
+				width: 100%;
+			}
+		</style>
+	</h:head>
+	 
+	<h:body>  	
+	 
+	 <p:growl id="growl" sticky="true" showDetail="true" life="3000" />
+	
+	   <div align="center">
+	   	         
+				<h:outputLabel value="Login" style="font-size:200%;" />
+				<h:panelGrid columns="1" cellpadding="5">
+					<h:form>
+				        <h:panelGrid columns="2" cellpadding="5">	        
+				        	 
+				            <h:outputLabel for="login" value="Login:" />
+				            <p:inputText id="login" value="#{user.login}" required="true" label="Login" />
+				 			
+				            <h:outputLabel for="password" value="Password:" />
+				            <p:password id="password" value="#{user.password}" required="true" label="password" />
+				 
+				            <f:facet name="footer">			            
+				                <p:commandButton value="Login" styleClass="myCustomStyle" action="#{user.loggedIn()}" update="growl"/>				                				                
+				            </f:facet> 
+				        </h:panelGrid>	
+			        </h:form> 	    
+		        
+			    	<f:facet name="footer">	
+			        	<h:form>			
+							<p:commandButton value="Register" action="register.xhtml?faces-redirect=true" onclick="register.xhtml?faces-redirect=true" styleClass="myCustomStyle"/>
+						</h:form> 
+			        </f:facet> 
+			        
+			    	
+			    </h:panelGrid>
+			    
+	   </div>
+		
+	   
+	   
+	</h:body>
+     
+</html>
