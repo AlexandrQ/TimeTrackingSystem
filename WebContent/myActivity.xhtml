@@ -31,7 +31,7 @@
 			function testMarkDaysFunc(date) {      				      				
       				if(date.toString().includes("Wed")) { 
       					//document.getElementById("targetLabel1").innerHTML = " newDate =  " + new Date(2018, 4, 23).getTime() + "   " + new Date(2018, 4, 23);  
-      					document.getElementById("targetLabel2").innerHTML += "CalendarDate = " + date.getTime() + "    " + date + '\n';      					
+      					//document.getElementById("targetLabel2").innerHTML += "CalendarDate = " + date.getTime() + "    " + date + '\n';      					
         				return [true, 'testMarkDay'];
       				} else {
       					return [true, '']
@@ -53,7 +53,7 @@
 	   
 	   <p:panelGrid columns="2">
 	   		
-	   		<p:dataTable var="activity" value="#{mainBean.activitiesList}"  >          		         		
+	   		<p:dataTable id="activityTable" var="activity" value="#{mainBean.activitiesList}"  >          		         		
 	          	
 	          		<f:facet name="header">
 	            		MyTable
@@ -94,7 +94,7 @@
 	   		
 	   		<h:form>
 	   			<p:calendar widgetVar="inlineCalendarW" id="event" value="#{calendarBean.date1}" mode="inline"  beforeShowDay="testMarkDaysFunc">
-	   				<p:ajax event="dateSelect" listener="#{calendarBean.onDateSelect}" update="growl" />
+	   				<p:ajax event="dateSelect" listener="#{mainBean.onDateSelect}" update="activityTable" />
 	   			</p:calendar>
 	   		</h:form>
 	   </p:panelGrid>
@@ -104,7 +104,13 @@
 	   
 	   <div><h:outputLabel id="targetLabel1" value="===" /></div>
 	   <div><h:outputLabel id="targetLabel2" value="===" /></div>
-	   <div><h:outputLabel id="targetLabel3" value="===" /></div>
+	   <div><p:tabMenu activeIndex="0">
+			<p:menuitem value="Overview" outcome="" icon="ui-icon-star"/>
+			<p:menuitem value="Demos" outcome="" icon="ui-icon-search" />
+			<p:menuitem value="Documentation" outcome="" icon="ui-icon-document"/>
+			<p:menuitem value="Support" outcome="" icon="ui-icon-wrench"/>
+			<p:menuitem value="Social" outcome="" icon="ui-icon-person" />
+		</p:tabMenu></div>
 	   
 	   
 	</h:body>

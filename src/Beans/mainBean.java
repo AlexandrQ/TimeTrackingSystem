@@ -10,15 +10,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Locale;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+
+import org.primefaces.event.SelectEvent;
 
 import dbCon.SingletonDBConnection;
 import entity.Activity;
@@ -54,7 +58,7 @@ public class MainBean implements Serializable{
 	public String loggedIn() {				
 		if(UserAutenticate(user.getLogin(), user.getPassword())) {			
 			user.setLogged(true);
-			getCurrentAtivities();				
+			getCurrentAtivities(LocalDate.now());				
 			return "myActivity.xhtml?faces-redirect=true";			
 		}
 		else {
@@ -116,8 +120,9 @@ public class MainBean implements Serializable{
 	}
 	
 	
-	private void getCurrentAtivities() {
-		ArrayList<LocalDate> daysInSelectedWeek = fillDaysInSelectedWeek(LocalDate.now());
+	private void getCurrentAtivities(LocalDate date) {
+		activitiesList.clear();
+		ArrayList<LocalDate> daysInSelectedWeek = fillDaysInSelectedWeek(date);
 		String queryStr = "SELECT activity_date, project_name, activity_percentage, activity_type_name, activity_task_group_name, activity_task_name, activity_comment, activity_proportion, activity_status_name" + 
 				"	FROM public.activities, public.projects, public.activity_types, public.activity_task_groups, public.activity_tasks, public.activity_statuses" + 
 				"    WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' )" + 
@@ -162,6 +167,8 @@ public class MainBean implements Serializable{
 				}
 	        }				
 		}
+	    
+	    fillActivitiesListForEmptyDays(daysInSelectedWeek);
 		
 	}
 	
@@ -199,5 +206,62 @@ public class MainBean implements Serializable{
 		
 		return daysInSelectedWeek;
 	}
+	
+	
+	private void fillActivitiesListForEmptyDays(ArrayList<LocalDate> daysInSelectedWeek) {
+		for(int i = 0; i < activitiesList.size(); i++ ) {
+			for(int j=0; j < daysInSelectedWeek.size(); j++) {
+				if(activitiesList.get(i).getDate().equals(daysInSelectedWeek.get(j).toString())) {
+					daysInSelectedWeek.remove(j);
+					break;
+				}
+			}
+		}
+		
+		for (int i = 0; i < daysInSelectedWeek.size(); i++) {
+			activitiesList.add(new Activity(daysInSelectedWeek.get(i).toString()));
+		}
+				
+		bubbleSortActivitiesListByDate();
+	}
+	
+	//сортирует только определенный лист activitiesList
+	private void bubbleSortActivitiesListByDate() {
+		int i = 0;
+        int goodPairsCounter = 0;
+        LocalDate date1 = null, date2 = null;
+        
+        while (true) {        	
+            if (date2.parse(activitiesList.get(i+1).getDate()).isBefore(date1.parse(activitiesList.get(i).getDate()))) {
+                Activity q = activitiesList.get(i);
+                activitiesList.set(i, activitiesList.get(i+1));
+                activitiesList.set((i + 1), q);
+                goodPairsCounter = 0;
+            } else {
+                goodPairsCounter++;
+            }
+            i++;
+            if (i == activitiesList.size() - 1) {
+                i = 0;
+            }
+            if (goodPairsCounter == activitiesList.size() - 1) break;
+        }        
+	}
+	
+	
+	public void onDateSelect(SelectEvent event) {
+		System.out.println("(My comment) onDateSelect->SelectEvent");
+		
+		//получаем выбранную дату из event
+		Date date = (Date) event.getObject();	
+		
+		//преобразуем Date в LocalDate
+		LocalDate dd = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();		
+		System.out.println("(My comment) onDateSelect->LocalDate: " + dd);
+		
+		
+		getCurrentAtivities(dd);
+	}
+	
 	
 }

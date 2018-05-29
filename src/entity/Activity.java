@@ -22,6 +22,11 @@ public class Activity implements Serializable{
 		
 	}	
 	
+	public Activity(String date) {
+		this.date = date;
+		this.status = "Not filled";
+	}
+	
 	public Activity(String date, String type, String proportion, String project, String taskGroup, String task,
 			String comment, String percentage,  String status) {
 		super();
