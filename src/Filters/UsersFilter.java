@@ -40,7 +40,7 @@ public class UsersFilter implements Filter {
 		String url = req.getRequestURI();		
 		
 		if (session == null || !session.getUser().isLogged()) {
-			if(url.indexOf("/myActivity.xhtml") >= 0 || url.indexOf("/logout.xhtml") >= 0) {
+			if(url.indexOf("/myActivity.xhtml") >= 0 || url.indexOf("/logout.xhtml") >= 0 || url.indexOf("/myVacations.xhtml") >= 0) {
 				resp.sendRedirect(req.getServletContext().getContextPath() + "/login.xhtml");
 			} else {
 				chain.doFilter(request, response);

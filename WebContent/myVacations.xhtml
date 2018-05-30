@@ -11,12 +11,21 @@
     >
  
 	<h:head>
-		<title>Page 2</title>	
+		<title>My Vacations</title>	
 	</h:head>
 	 
 	<h:body>  	
 	 
 	 <p>Hello!</p>
+	 
+	 <div><p:tabMenu activeIndex="1">
+			<p:menuitem value="My Activity" url="myActivity.xhtml">
+				<f:param name="i" value="0" />
+			</p:menuitem>
+			<p:menuitem value="My Vacations" url="myVacations.xhtml">
+				<f:param name="i" value="1" />
+			</p:menuitem>			
+		</p:tabMenu></div>
 		
 	   
 	   

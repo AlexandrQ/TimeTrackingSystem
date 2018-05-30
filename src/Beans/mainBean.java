@@ -123,7 +123,7 @@ public class MainBean implements Serializable{
 	private void getCurrentAtivities(LocalDate date) {
 		activitiesList.clear();
 		ArrayList<LocalDate> daysInSelectedWeek = fillDaysInSelectedWeek(date);
-		String queryStr = "SELECT activity_date, project_name, activity_percentage, activity_type_name, activity_task_group_name, activity_task_name, activity_comment, activity_proportion, activity_status_name" + 
+		String queryStr = "SELECT activity_date, project_name,  activity_proportion,  activity_type_name, activity_task_group_name, activity_task_name, activity_comment, activity_percentage, activity_status_name" + 
 				"	FROM public.activities, public.projects, public.activity_types, public.activity_task_groups, public.activity_tasks, public.activity_statuses" + 
 				"    WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' )" + 
 				"    AND activity_date between '" + daysInSelectedWeek.get(0).toString() + "' and '" + daysInSelectedWeek.get(daysInSelectedWeek.size()-1).toString() + "'" + 
@@ -146,12 +146,12 @@ public class MainBean implements Serializable{
 		    while (rs.next()) {	
 		    	Activity activity = new Activity(rs.getString("activity_date"), 
 		    			rs.getString("project_name"),
-		    			rs.getString("activity_percentage"),
+		    			rs.getString("activity_proportion"),
 		    			rs.getString("activity_type_name"), 
 		    			rs.getString("activity_task_group_name"), 
 		    			rs.getString("activity_task_name"),
 		    			rs.getString("activity_comment"),
-		    			rs.getString("activity_proportion"),
+		    			rs.getString("activity_percentage"),
 		    			rs.getString("activity_status_name"));	 
 		    	activitiesList.add(activity);
 		    }    
