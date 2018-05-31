@@ -40,93 +40,99 @@
 	 
 	<h:body>
 	
-		<p:growl id="growl" sticky="true" showDetail="true" life="3000" />  		 
-	 
-	 	<div><h:outputLabel value="Welcome to Hide Page!" /> </div>	   
-	   
-	   
-	   
-	   <div><h:outputLabel value="Hidden label on hidden page! Only for admin :)" rendered="#{mainBean.user.login == 'admin'}"/></div>
+		<p:growl id="growl" sticky="true" showDetail="true" life="3000" />  
 		
-			 <table style="width:100%; border-style: solid; border-width: 1px; font-size: 10px;">
-				  <tr >
-				    <th colspan="2" style="border-style: solid; border-width: 1px;">
-						<p:tabMenu activeIndex="0">
-							<p:menuitem value="My Activity" url="myActivity.xhtml">
-								<f:param name="i" value="0" />
-							</p:menuitem>
-							<p:menuitem value="My Vacations" url="myVacations.xhtml">
-								<f:param name="i" value="1" />
-							</p:menuitem>			
-						</p:tabMenu>
-					</th>				    
-				  </tr>
-				  <tr>
-				    <td style="border-style: solid; border-width: 1px;">BBB</td>
-				    <td rowspan="2" style="border-style: solid; border-width: 1px; width: 70px;  vertical-align: top;">
-						<h:form>
-				   			<p:calendar id="event" value="#{calendarBean.date1}" mode="inline"  beforeShowDay="testMarkDaysFunc" >
-				   				<p:ajax event="dateSelect" listener="#{mainBean.onDateSelect}" update="activityTable" />
-				   			</p:calendar>
-	   					</h:form>
-					</td>				    
-				  </tr>
-				  <tr>
-				    <td style="border-style: solid; width: 85%; border-width: 1px;">
-				    	<p:dataTable id="activityTable" var="activity" value="#{mainBean.activitiesList}"  >
-							<p:column headerText="Date">	
-								<h:outputText value="#{activity.date}" />		               				
-							</p:column>
-							<p:column headerText="Activity type">	
-								<h:outputText value="#{activity.type}" />
-							</p:column>
-							<p:column headerText="Proportion">
-								<h:outputText value="#{activity.proportion}" />	 						
-							</p:column>
-							<p:column headerText="Project">
-								<h:outputText value="#{activity.project}" />	 						
-							</p:column>	 	
-							<p:column headerText="Task Group">
-								<h:outputText value="#{activity.taskGroup}" />	 						
-							</p:column>	
-							<p:column headerText="Task">
-								<h:outputText value="#{activity.task}" />	 						
-							</p:column>	
-							<p:column headerText="Comment">
-								<h:outputText value="#{activity.comment}" />	 						
-							</p:column>	
-							<p:column headerText="%" style="width: 20px;">
-								<h:outputText value="#{activity.percentage}" />	 						
-							</p:column>	
-							<p:column headerText="Status">
-								<h:outputText value="#{activity.status}" />	 						
-							</p:column>		
-							<p:column headerText="Approve btn">
-								<h:outputText value="Approve btn" />	 						
-							</p:column>
-						</p:dataTable>
-				    </td>				    				    
-				  </tr>
-				  <tr>
-				    <td style="border-style: solid; border-width: 1px;">SSS</td>
-				    <td style="border-style: solid; border-width: 1px;">DDD</td>				    				    
-				  </tr>
-				  <tr>
-				    <td style="border-style: solid; border-width: 1px;">QQQ</td>
-				    <td style="border-style: solid; border-width: 1px;">RRR</td>				    				    
-				  </tr>
-			</table> 
-			
-			
-			
+		<div><h:outputLabel value="Hidden label on hidden page! Only for admin :)" rendered="#{mainBean.user.login == 'admin'}"/></div>		
+		<table style="width:100%; border-style: solid; border-width: 1px; font-size: 10px;">
+			<tr >
+				<th colspan="2" style="border-style: solid; border-width: 1px;">
+					<p:tabMenu activeIndex="0">
+						<p:menuitem value="My Activity" url="myActivity.xhtml">
+							<f:param name="i" value="0" />
+						</p:menuitem>
+						<p:menuitem value="My Vacations" url="myVacations.xhtml">
+							<f:param name="i" value="1" />
+						</p:menuitem>			
+					</p:tabMenu>
+				</th>				    
+			</tr>
+			<tr>
+				<td style="border-style: solid; border-width: 1px;">
+					<h:form>    
+					    <p:toolbar>
+					        <f:facet name="left">
+					            <p:commandButton id="weekB" type="submit" value="Week"  actionListener="#{mainBean.showWeekActions}" update="activityTable"/>
+					 
+					            <p:commandButton id="monthB" type="submit" value="Month"  actionListener="#{mainBean.showMonthActions}" update="activityTable"/>
+					 
+					            <span class="ui-separator">
+					                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+					            </span>
+					        </f:facet>		 
+					        <f:facet name="right">
+					            <p:menuButton value="Options">
+					            	 <p:menuitem value="Week" actionListener="#{mainBean.showWeekActions}" update="activityTable" icon="ui-icon-disk" />
+					            	 <p:menuitem value="Month" actionListener="#{mainBean.showMonthActions}" update="activityTable" icon="ui-icon-disk" />					                
+					            </p:menuButton>
+					        </f:facet>					 
+					    </p:toolbar>
+					</h:form>	
+				</td>
+				<td rowspan="2" style="border-style: solid; border-width: 1px; width: 70px;  vertical-align: top;">
+					<h:form>
+			   			<p:calendar id="event" value="#{calendarBean.date1}" mode="inline"  beforeShowDay="testMarkDaysFunc" >
+			   				<p:ajax event="dateSelect" listener="#{mainBean.onDateSelect}" update="activityTable" />
+			   			</p:calendar>
+   					</h:form>
+				</td>				    
+			</tr>
+			<tr>
+				<td style="border-style: solid; width: 85%; border-width: 1px;">
+			    	<p:dataTable id="activityTable" var="activity" value="#{mainBean.activitiesList}"  >
+						<p:column headerText="Date">	
+							<h:outputText value="#{activity.date}" />		               				
+						</p:column>
+						<p:column headerText="Activity type">	
+							<h:outputText value="#{activity.type}" />
+						</p:column>
+						<p:column headerText="Proportion">
+							<h:outputText value="#{activity.proportion}" />	 						
+						</p:column>
+						<p:column headerText="Project">
+							<h:outputText value="#{activity.project}" />	 						
+						</p:column>	 	
+						<p:column headerText="Task Group">
+							<h:outputText value="#{activity.taskGroup}" />	 						
+						</p:column>	
+						<p:column headerText="Task">
+							<h:outputText value="#{activity.task}" />	 						
+						</p:column>	
+						<p:column headerText="Comment">
+							<h:outputText value="#{activity.comment}" />	 						
+						</p:column>	
+						<p:column headerText="%" style="width: 20px;">
+							<h:outputText value="#{activity.percentage}" />	 						
+						</p:column>	
+						<p:column headerText="Status">
+							<h:outputText value="#{activity.status}" />	 						
+						</p:column>		
+						<p:column headerText="Approve btn">
+							<h:outputText value="Approve btn" />	 						
+						</p:column>
+					</p:dataTable>
+				</td>				    				    
+			</tr>
+			<tr>
+			    <td style="border-style: solid; border-width: 1px;">SSS</td>
+			    <td style="border-style: solid; border-width: 1px;">DDD</td>				    				    
+			</tr>
+			<tr>
+			    <td style="border-style: solid; border-width: 1px;">QQQ</td>
+			    <td style="border-style: solid; border-width: 1px;">RRR</td>				    				    
+			</tr>
+		</table> 
 		
-	   	
-	   
-	   <div><h:outputLabel id="targetLabel1" value="===" /></div>
-	   <div><h:outputLabel id="targetLabel2" value="===" /></div>
-	    
-	   
-	   
+		<div><h:outputLabel id="targetLabel1" value="===" /></div>
+		<div><h:outputLabel id="targetLabel2" value="===" /></div>
 	</h:body>
-     
 </html>

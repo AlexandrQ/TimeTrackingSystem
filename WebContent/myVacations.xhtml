@@ -16,19 +16,54 @@
 	 
 	<h:body>  	
 	 
-	 <p>Hello!</p>
-	 
-	 <div><p:tabMenu activeIndex="1">
-			<p:menuitem value="My Activity" url="myActivity.xhtml">
-				<f:param name="i" value="0" />
-			</p:menuitem>
-			<p:menuitem value="My Vacations" url="myVacations.xhtml">
-				<f:param name="i" value="1" />
-			</p:menuitem>			
-		</p:tabMenu></div>
+		<p>Hello!</p>
+		 
+		<table style="width:100%; border-style: solid; border-width: 1px; font-size: 10px;">
+			<tr >
+				<th colspan="3" style="border-style: solid; border-width: 1px;">
+					<p:tabMenu activeIndex="1">
+						<p:menuitem value="My Activity" url="myActivity.xhtml">
+							<f:param name="i" value="0" />
+						</p:menuitem>
+						<p:menuitem value="My Vacations" url="myVacations.xhtml">
+							<f:param name="i" value="1" />
+						</p:menuitem>			
+					</p:tabMenu>
+				</th>					    
+			</tr>
+			<tr>
+				<th colspan="2" style="border-style: solid; border-width: 1px;">	
+					AAA
+				</th>
+				<th rowspan="3" style="border-style: solid; border-width: 1px;">
+					BBB	
+				</th>
+			</tr>
+			<tr>
+				<th style="border-style: solid; border-width: 1px;">	
+					CCC
+				</th>
+				<th style="border-style: solid; border-width: 1px;">
+					DDD	
+				</th>
+			</tr>
+			<tr>
+				<th colspan="2" style="border-style: solid; border-width: 1px;">
+					EEE	
+				</th>				
+			</tr>
+			<tr>
+				<th style="border-style: solid; border-width: 1px;">
+					FFF
+				</th>
+				<th style="border-style: solid; border-width: 1px;">
+					JJJ
+				</th>
+				<th style="border-style: solid; border-width: 1px;">
+					HHH
+				</th>				
+			</tr>
+		</table>
 		
-	   
-	   
-	</h:body>
-     
+	</h:body>     
 </html>

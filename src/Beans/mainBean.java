@@ -21,6 +21,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 
 import org.primefaces.event.SelectEvent;
 
@@ -35,10 +36,38 @@ import entity.User;
 public class MainBean implements Serializable{
 
 	private User user = new User();
-	private ArrayList<Activity> activitiesList = new ArrayList<>();	
+	private ArrayList<Activity> activitiesList = new ArrayList<>();
+	private ArrayList<Activity> activitiesListWeek = new ArrayList<>();	
+	private ArrayList<Activity> activitiesListMonth = new ArrayList<>();	
+	private String lengthOfCurrentActivitiesList = "week";
 	
 	
 	
+	
+	public ArrayList<Activity> getActivitiesListWeek() {
+		return activitiesListWeek;
+	}
+
+	public void setActivitiesListWeek(ArrayList<Activity> activitiesListWeek) {
+		this.activitiesListWeek = activitiesListWeek;
+	}
+
+	public ArrayList<Activity> getActivitiesListMonth() {
+		return activitiesListMonth;
+	}
+
+	public void setActivitiesListMonth(ArrayList<Activity> activitiesListMonth) {
+		this.activitiesListMonth = activitiesListMonth;
+	}
+
+	public String getLengthOfCurrentActivitiesList() {
+		return lengthOfCurrentActivitiesList;
+	}
+
+	public void setLengthOfCurrentActivitiesList(String lengthOfCurrentActivitiesList) {
+		this.lengthOfCurrentActivitiesList = lengthOfCurrentActivitiesList;
+	}
+
 	public User getUser() {
 		return user;
 	}
@@ -119,11 +148,16 @@ public class MainBean implements Serializable{
 			}				
 	}
 	
-	
-	private void getCurrentAtivities(LocalDate date) {
+	//w - week, m = month
+	private void getCurrentAtivities(LocalDate date) {		
 		activitiesList.clear();
-		ArrayList<LocalDate> daysInSelectedWeek = fillDaysInSelectedWeek(date);
-		String queryStr = "SELECT activity_date, project_name,  activity_proportion,  activity_type_name, activity_task_group_name, activity_task_name, activity_comment, activity_percentage, activity_status_name" + 
+		activitiesListWeek.clear();
+		activitiesListMonth.clear();
+		
+		ArrayList<LocalDate> daysInSelectedWeek = fillDaysInSelectedWeek(date); 
+		ArrayList<LocalDate> daysInSelectedMonth = fillDaysInSelectedMonth(date);
+		
+		String queryStrWeek = "SELECT activity_date, project_name,  activity_proportion,  activity_type_name, activity_task_group_name, activity_task_name, activity_comment, activity_percentage, activity_status_name" + 
 				"	FROM public.activities, public.projects, public.activity_types, public.activity_task_groups, public.activity_tasks, public.activity_statuses" + 
 				"    WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' )" + 
 				"    AND activity_date between '" + daysInSelectedWeek.get(0).toString() + "' and '" + daysInSelectedWeek.get(daysInSelectedWeek.size()-1).toString() + "'" + 
@@ -133,28 +167,53 @@ public class MainBean implements Serializable{
 				"    AND activity_task = activity_task_id" + 
 				"    AND activity_status = activity_status_id";
 		
+		String queryStrMonth = "SELECT activity_date, project_name,  activity_proportion,  activity_type_name, activity_task_group_name, activity_task_name, activity_comment, activity_percentage, activity_status_name" + 
+				"	FROM public.activities, public.projects, public.activity_types, public.activity_task_groups, public.activity_tasks, public.activity_statuses" + 
+				"    WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' )" + 
+				"    AND activity_date between '" + daysInSelectedMonth.get(0).toString() + "' and '" + daysInSelectedMonth.get(daysInSelectedMonth.size()-1).toString() + "'" + 
+				"    AND activity_project = project_id" + 
+				"    AND activity_type = activity_type_id" + 
+				"    AND activity_task_group = activity_task_group_id" + 
+				"    AND activity_task = activity_task_id" + 
+				"    AND activity_status = activity_status_id";
+		
 		Connection dbConnection = null;
 	    Statement statement = null;
-	    ResultSet rs;
+	    ResultSet rsWeek, rsMonth;
 	    
 	    try {
 		    dbConnection = SingletonDBConnection.getInstance().getConnInst();
 		    statement = dbConnection.createStatement();	 
 		    
-		    rs = statement.executeQuery(queryStr);		    
+		    rsWeek = statement.executeQuery(queryStrWeek);		    
 		    
-		    while (rs.next()) {	
-		    	Activity activity = new Activity(rs.getString("activity_date"), 
-		    			rs.getString("project_name"),
-		    			rs.getString("activity_proportion"),
-		    			rs.getString("activity_type_name"), 
-		    			rs.getString("activity_task_group_name"), 
-		    			rs.getString("activity_task_name"),
-		    			rs.getString("activity_comment"),
-		    			rs.getString("activity_percentage"),
-		    			rs.getString("activity_status_name"));	 
-		    	activitiesList.add(activity);
-		    }    
+		    while (rsWeek.next()) {	
+		    	Activity activity = new Activity(rsWeek.getString("activity_date"), 
+		    			rsWeek.getString("project_name"),
+		    			rsWeek.getString("activity_proportion"),
+		    			rsWeek.getString("activity_type_name"), 
+		    			rsWeek.getString("activity_task_group_name"), 
+		    			rsWeek.getString("activity_task_name"),
+		    			rsWeek.getString("activity_comment"),
+		    			rsWeek.getString("activity_percentage"),
+		    			rsWeek.getString("activity_status_name"));	 
+		    	activitiesListWeek.add(activity);
+		    }
+		    
+		    rsMonth = statement.executeQuery(queryStrMonth);
+		    
+		    while (rsMonth.next()) {	
+		    	Activity activity = new Activity(rsMonth.getString("activity_date"), 
+		    			rsMonth.getString("project_name"),
+		    			rsMonth.getString("activity_proportion"),
+		    			rsMonth.getString("activity_type_name"), 
+		    			rsMonth.getString("activity_task_group_name"), 
+		    			rsMonth.getString("activity_task_name"),
+		    			rsMonth.getString("activity_comment"),
+		    			rsMonth.getString("activity_percentage"),
+		    			rsMonth.getString("activity_status_name"));	 
+		    	activitiesListMonth.add(activity);
+		    }
 			
 		} catch (SQLException e) {
 		    System.out.println(e.getMessage());	 
@@ -169,7 +228,10 @@ public class MainBean implements Serializable{
 		}
 	    
 	    fillActivitiesListForEmptyDays(daysInSelectedWeek);
+	    fillActivitiesListForEmptyDays(daysInSelectedMonth);
 		
+	    if (lengthOfCurrentActivitiesList.equals("week")) {activitiesList = activitiesListWeek;}
+	    else if((lengthOfCurrentActivitiesList.equals("month"))) {activitiesList = activitiesListMonth;}
 	}
 	
 	
@@ -201,51 +263,128 @@ public class MainBean implements Serializable{
 		Collections.sort(daysInSelectedWeek);
 		
 		for (int i = 0; i < daysInSelectedWeek.size(); i++) {
-			System.out.println("(My comment) Array: " + daysInSelectedWeek.get(i) );
+			System.out.println("(My comment) ArrayWeek: " + daysInSelectedWeek.get(i) );
 		}
 		
 		return daysInSelectedWeek;
 	}
 	
 	
-	private void fillActivitiesListForEmptyDays(ArrayList<LocalDate> daysInSelectedWeek) {
-		for(int i = 0; i < activitiesList.size(); i++ ) {
-			for(int j=0; j < daysInSelectedWeek.size(); j++) {
-				if(activitiesList.get(i).getDate().equals(daysInSelectedWeek.get(j).toString())) {
-					daysInSelectedWeek.remove(j);
-					break;
-				}
-			}
+	private ArrayList<LocalDate> fillDaysInSelectedMonth(LocalDate date) {
+		//+-31 days
+		int selectedMonth;
+		ArrayList<LocalDate> daysInSelectedMonth = new ArrayList<>();
+		daysInSelectedMonth.add(date);
+		
+		//получаем из LocalDate номер недели
+		//WeekFields weekFields = WeekFields.of(Locale.getDefault()); 		
+		//selectedWeek = date.get(weekFields.weekOfWeekBasedYear());
+		selectedMonth = date.getMonthValue();
+		
+		 		
+		int numberOfMonth = -1;
+		LocalDate myDate1 = LocalDate.of(date.getYear(), date.getMonth(), date.getDayOfMonth());
+		LocalDate myDate2;
+		
+		for (int i = 1; i<31; i++) {
+			myDate2 = myDate1.plusDays(i);
+			numberOfMonth = myDate2.getMonthValue() ;
+			if (numberOfMonth == selectedMonth) daysInSelectedMonth.add(myDate2);
+			
+			myDate2 = myDate1.minusDays(i);
+			numberOfMonth = myDate2.getMonthValue();
+			if (numberOfMonth == selectedMonth) daysInSelectedMonth.add(myDate2);
 		}
 		
-		for (int i = 0; i < daysInSelectedWeek.size(); i++) {
-			activitiesList.add(new Activity(daysInSelectedWeek.get(i).toString()));
+		Collections.sort(daysInSelectedMonth);
+		
+		for (int i = 0; i < daysInSelectedMonth.size(); i++) {
+			System.out.println("(My comment) ArrayMonth: " + daysInSelectedMonth.get(i) );
 		}
-				
-		bubbleSortActivitiesListByDate();
+		
+		return daysInSelectedMonth;
 	}
 	
-	//сортирует только определенный лист activitiesList
-	private void bubbleSortActivitiesListByDate() {
+	
+	private void fillActivitiesListForEmptyDays(ArrayList<LocalDate> daysInSelectedPeriod) {
+		if(daysInSelectedPeriod.size() < 8) {
+			for(int i = 0; i < activitiesListWeek.size(); i++ ) {
+				for(int j=0; j < daysInSelectedPeriod.size(); j++) {
+					if(activitiesListWeek.get(i).getDate().equals(daysInSelectedPeriod.get(j).toString())) {
+						daysInSelectedPeriod.remove(j);
+						break;
+					}
+				}
+			}
+			
+			for (int i = 0; i < daysInSelectedPeriod.size(); i++) {
+				activitiesListWeek.add(new Activity(daysInSelectedPeriod.get(i).toString()));
+			}
+			
+			bubbleSortActivitiesListByDate("week");
+		}
+		else {
+			for(int i = 0; i < activitiesListMonth.size(); i++ ) {
+				for(int j=0; j < daysInSelectedPeriod.size(); j++) {
+					if(activitiesListMonth.get(i).getDate().equals(daysInSelectedPeriod.get(j).toString())) {
+						daysInSelectedPeriod.remove(j);
+						break;
+					}
+				}
+			}
+			
+			for (int i = 0; i < daysInSelectedPeriod.size(); i++) {
+				activitiesListMonth.add(new Activity(daysInSelectedPeriod.get(i).toString()));
+			}
+			
+			bubbleSortActivitiesListByDate("month");
+		}
+				
+		
+	}
+	
+	//сортирует только определенный лист activitiesListWeek и activitiesListMonth
+	private void bubbleSortActivitiesListByDate(String str) {
 		int i = 0;
         int goodPairsCounter = 0;
         LocalDate date1 = null, date2 = null;
         
-        while (true) {        	
-            if (date2.parse(activitiesList.get(i+1).getDate()).isBefore(date1.parse(activitiesList.get(i).getDate()))) {
-                Activity q = activitiesList.get(i);
-                activitiesList.set(i, activitiesList.get(i+1));
-                activitiesList.set((i + 1), q);
-                goodPairsCounter = 0;
-            } else {
-                goodPairsCounter++;
-            }
-            i++;
-            if (i == activitiesList.size() - 1) {
-                i = 0;
-            }
-            if (goodPairsCounter == activitiesList.size() - 1) break;
-        }        
+        if(str.equals("week")) {
+        	while (true) {        	
+                if (date2.parse(activitiesListWeek.get(i+1).getDate()).isBefore(date1.parse(activitiesListWeek.get(i).getDate()))) {
+                    Activity q = activitiesListWeek.get(i);
+                    activitiesListWeek.set(i, activitiesListWeek.get(i+1));
+                    activitiesListWeek.set((i + 1), q);
+                    goodPairsCounter = 0;
+                } else {
+                    goodPairsCounter++;
+                }
+                i++;
+                if (i == activitiesListWeek.size() - 1) {
+                    i = 0;
+                }
+                if (goodPairsCounter == activitiesListWeek.size() - 1) break;
+            }        
+        }
+        else if(str.equals("month")){
+        	while (true) {        	
+                if (date2.parse(activitiesListMonth.get(i+1).getDate()).isBefore(date1.parse(activitiesListMonth.get(i).getDate()))) {
+                    Activity q = activitiesListMonth.get(i);
+                    activitiesListMonth.set(i, activitiesListMonth.get(i+1));
+                    activitiesListMonth.set((i + 1), q);
+                    goodPairsCounter = 0;
+                } else {
+                    goodPairsCounter++;
+                }
+                i++;
+                if (i == activitiesListMonth.size() - 1) {
+                    i = 0;
+                }
+                if (goodPairsCounter == activitiesListMonth.size() - 1) break;
+            }        
+        }
+        
+        
 	}
 	
 	
@@ -259,8 +398,18 @@ public class MainBean implements Serializable{
 		LocalDate dd = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();		
 		System.out.println("(My comment) onDateSelect->LocalDate: " + dd);
 		
-		
 		getCurrentAtivities(dd);
+	}
+	
+	
+	public void showWeekActions(){
+		lengthOfCurrentActivitiesList = "week";
+		getCurrentAtivities(LocalDate.now());
+	}
+	
+	public void showMonthActions(){
+		lengthOfCurrentActivitiesList = "month";
+		getCurrentAtivities(LocalDate.now());
 	}
 	
 	
