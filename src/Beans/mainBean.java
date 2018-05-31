@@ -21,7 +21,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 
 import org.primefaces.event.SelectEvent;
 
@@ -41,9 +40,46 @@ public class MainBean implements Serializable{
 	private ArrayList<Activity> activitiesListMonth = new ArrayList<>();	
 	private String lengthOfCurrentActivitiesList = "week";
 	
+	private ArrayList<String> workDaysForCalendar = new ArrayList<>();
+	private ArrayList<String> vacationDaysForCalendar = new ArrayList<>();	
+	private ArrayList<String> sickDaysForCalendar = new ArrayList<>();
+	private ArrayList<String> daysOffForCalendar = new ArrayList<>();
 	
 	
 	
+	
+	public ArrayList<String> getVacationDaysForCalendar() {
+		return vacationDaysForCalendar;
+	}
+
+	public void setVacationDaysForCalendar(ArrayList<String> vacationDaysForCalendar) {
+		this.vacationDaysForCalendar = vacationDaysForCalendar;
+	}
+
+	public ArrayList<String> getWorkDaysForCalendar() {
+		return workDaysForCalendar;
+	}
+
+	public void setWorkDaysForCalendar(ArrayList<String> workDaysForCalendar) {
+		this.workDaysForCalendar = workDaysForCalendar;
+	}
+
+	public ArrayList<String> getSickDaysForCalendar() {
+		return sickDaysForCalendar;
+	}
+
+	public void setSickDaysForCalendar(ArrayList<String> sickDaysForCalendar) {
+		this.sickDaysForCalendar = sickDaysForCalendar;
+	}
+
+	public ArrayList<String> getDaysOffForCalendar() {
+		return daysOffForCalendar;
+	}
+
+	public void setDaysOffForCalendar(ArrayList<String> daysOffForCalendar) {
+		this.daysOffForCalendar = daysOffForCalendar;
+	}
+
 	public ArrayList<Activity> getActivitiesListWeek() {
 		return activitiesListWeek;
 	}
@@ -115,19 +151,31 @@ public class MainBean implements Serializable{
 		
 			String Password = password;
 			
-			String querryStr = "SELECT COUNT(user_login) AS Count FROM public.\"users\" WHERE user_login = '" + login + "' AND user_password = '" + Password + "'";
+			String querryStrCount = "SELECT COUNT(user_login) AS Count FROM public.\"users\" WHERE user_login = '" + login + "' AND user_password = '" + Password + "'";
+			String querryStrUser = "SELECT user_id, user_login, user_password, user_name, user_surname, project_name, user_role_name" + 
+					"	FROM public.users, public.projects, public.user_roles" + 
+					"    WHERE user_login = '" + login + "'" + 
+					"    AND user_project = project_id" + 					 
+					"    AND user_role = user_role_id";
 			Connection dbConnection = null;
 		    Statement statement = null;
-		    ResultSet rs;
+		    ResultSet rsCount, rsUser;
 			
 			try {				
 			    dbConnection = SingletonDBConnection.getInstance().getConnInst();		    	
 			    statement = dbConnection.createStatement();		 
 			    
-			    rs = statement.executeQuery(querryStr);		    
+			    rsCount = statement.executeQuery(querryStrCount);		    
 			    
-			    if (rs.next()) {		    	
-			    	if(rs.getString("Count").equals("1") ) {
+			    if (rsCount.next()) {		    	
+			    	if(rsCount.getString("Count").equals("1") ) {
+			    		rsUser = statement.executeQuery(querryStrUser);
+			    		while (rsUser.next()) {	
+					    		user.setName(rsUser.getString("user_name"));	 
+					    		user.setSurname(rsUser.getString("user_surname"));	
+					    		user.setProject(rsUser.getString("project_name"));	
+					    		user.setRole(rsUser.getString("user_role_name"));
+					    }
 				    	return true;
 				    }
 			    	else return false;   
@@ -148,7 +196,7 @@ public class MainBean implements Serializable{
 			}				
 	}
 	
-	//w - week, m = month
+	
 	private void getCurrentAtivities(LocalDate date) {		
 		activitiesList.clear();
 		activitiesListWeek.clear();
@@ -159,27 +207,43 @@ public class MainBean implements Serializable{
 		
 		String queryStrWeek = "SELECT activity_date, project_name,  activity_proportion,  activity_type_name, activity_task_group_name, activity_task_name, activity_comment, activity_percentage, activity_status_name" + 
 				"	FROM public.activities, public.projects, public.activity_types, public.activity_task_groups, public.activity_tasks, public.activity_statuses" + 
-				"    WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' )" + 
-				"    AND activity_date between '" + daysInSelectedWeek.get(0).toString() + "' and '" + daysInSelectedWeek.get(daysInSelectedWeek.size()-1).toString() + "'" + 
-				"    AND activity_project = project_id" + 
-				"    AND activity_type = activity_type_id" + 
-				"    AND activity_task_group = activity_task_group_id" + 
-				"    AND activity_task = activity_task_id" + 
-				"    AND activity_status = activity_status_id";
+				"   WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' )" + 
+				"   AND activity_date between '" + daysInSelectedWeek.get(0).toString() + "' and '" + daysInSelectedWeek.get(daysInSelectedWeek.size()-1).toString() + "'" + 
+				"   AND activity_project = project_id" + 
+				"   AND activity_type = activity_type_id" + 
+				"   AND activity_task_group = activity_task_group_id" + 
+				"   AND activity_task = activity_task_id" + 
+				"   AND activity_status = activity_status_id";
+		
+		String queryStrWeekForNotWorkDays = "SELECT DISTINCT activity_date, activity_proportion,  activity_type_name, activity_comment, activity_percentage, activity_status_name" + 
+				"	FROM public.activities, public.projects, public.activity_types, public.activity_task_groups, public.activity_tasks, public.activity_statuses " + 
+				"   WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' )" + 
+				"   AND activity_date between '" + daysInSelectedWeek.get(0).toString() + "' and '" + daysInSelectedWeek.get(daysInSelectedWeek.size()-1).toString() + "'" + 
+				"   AND activity_type = activity_type_id" +
+				"   AND activity_status = activity_status_id" +
+				"	AND NOT activity_type = 1";
 		
 		String queryStrMonth = "SELECT activity_date, project_name,  activity_proportion,  activity_type_name, activity_task_group_name, activity_task_name, activity_comment, activity_percentage, activity_status_name" + 
 				"	FROM public.activities, public.projects, public.activity_types, public.activity_task_groups, public.activity_tasks, public.activity_statuses" + 
-				"    WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' )" + 
-				"    AND activity_date between '" + daysInSelectedMonth.get(0).toString() + "' and '" + daysInSelectedMonth.get(daysInSelectedMonth.size()-1).toString() + "'" + 
-				"    AND activity_project = project_id" + 
-				"    AND activity_type = activity_type_id" + 
-				"    AND activity_task_group = activity_task_group_id" + 
-				"    AND activity_task = activity_task_id" + 
-				"    AND activity_status = activity_status_id";
+				"   WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' )" + 
+				"   AND activity_date between '" + daysInSelectedMonth.get(0).toString() + "' and '" + daysInSelectedMonth.get(daysInSelectedMonth.size()-1).toString() + "'" + 
+				"   AND activity_project = project_id" + 
+				"   AND activity_type = activity_type_id" + 
+				"   AND activity_task_group = activity_task_group_id" + 
+				"   AND activity_task = activity_task_id" + 
+				"   AND activity_status = activity_status_id";
+		
+		String queryStrMonthForNotWorkDays = "SELECT DISTINCT activity_date, activity_proportion,  activity_type_name, activity_comment, activity_percentage, activity_status_name" + 
+				"	FROM public.activities, public.projects, public.activity_types, public.activity_task_groups, public.activity_tasks, public.activity_statuses" + 
+				"	WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' )" + 
+				"	AND activity_date between '" + daysInSelectedMonth.get(0).toString() + "' and '" + daysInSelectedMonth.get(daysInSelectedMonth.size()-1).toString() + "'" + 
+				"	AND activity_type = activity_type_id" + 
+				"	AND activity_status = activity_status_id" +
+				"	AND NOT activity_type = 1";
 		
 		Connection dbConnection = null;
 	    Statement statement = null;
-	    ResultSet rsWeek, rsMonth;
+	    ResultSet rsWeek, rsMonth, rsWeekNWD, rsMonthNWD;
 	    
 	    try {
 		    dbConnection = SingletonDBConnection.getInstance().getConnInst();
@@ -189,30 +253,54 @@ public class MainBean implements Serializable{
 		    
 		    while (rsWeek.next()) {	
 		    	Activity activity = new Activity(rsWeek.getString("activity_date"), 
-		    			rsWeek.getString("project_name"),
+		    			rsWeek.getString("activity_type_name"),
 		    			rsWeek.getString("activity_proportion"),
-		    			rsWeek.getString("activity_type_name"), 
+		    			rsWeek.getString("project_name"),
 		    			rsWeek.getString("activity_task_group_name"), 
 		    			rsWeek.getString("activity_task_name"),
 		    			rsWeek.getString("activity_comment"),
 		    			rsWeek.getString("activity_percentage"),
-		    			rsWeek.getString("activity_status_name"));	 
+		    			rsWeek.getString("activity_status_name"));		 
+		    	activitiesListWeek.add(activity);
+		    }
+		    
+		    rsWeekNWD = statement.executeQuery(queryStrWeekForNotWorkDays);		    
+		    
+		    while (rsWeekNWD.next()) {	
+		    	Activity activity = new Activity(rsWeekNWD.getString("activity_date"), 
+		    			rsWeekNWD.getString("activity_type_name"),
+		    			rsWeekNWD.getString("activity_proportion"),
+		    			rsWeekNWD.getString("activity_comment"),
+		    			rsWeekNWD.getString("activity_percentage"),
+		    			rsWeekNWD.getString("activity_status_name"));		 
 		    	activitiesListWeek.add(activity);
 		    }
 		    
 		    rsMonth = statement.executeQuery(queryStrMonth);
 		    
 		    while (rsMonth.next()) {	
-		    	Activity activity = new Activity(rsMonth.getString("activity_date"), 
-		    			rsMonth.getString("project_name"),
+		    	Activity activity = new Activity(rsMonth.getString("activity_date"),
+		    			rsMonth.getString("activity_type_name"),
 		    			rsMonth.getString("activity_proportion"),
-		    			rsMonth.getString("activity_type_name"), 
+		    			rsMonth.getString("project_name"),
 		    			rsMonth.getString("activity_task_group_name"), 
 		    			rsMonth.getString("activity_task_name"),
 		    			rsMonth.getString("activity_comment"),
 		    			rsMonth.getString("activity_percentage"),
 		    			rsMonth.getString("activity_status_name"));	 
-		    	activitiesListMonth.add(activity);
+		    	activitiesListMonth.add(activity);		    	
+		    }
+		    
+		    rsMonthNWD = statement.executeQuery(queryStrMonthForNotWorkDays);
+		    
+		    while (rsMonthNWD.next()) {	
+		    	Activity activity = new Activity(rsMonthNWD.getString("activity_date"),
+		    			rsMonthNWD.getString("activity_type_name"),
+		    			rsMonthNWD.getString("activity_proportion"),		    			
+		    			rsMonthNWD.getString("activity_comment"),
+		    			rsMonthNWD.getString("activity_percentage"),
+		    			rsMonthNWD.getString("activity_status_name"));	 
+		    	activitiesListMonth.add(activity);		    	
 		    }
 			
 		} catch (SQLException e) {
@@ -232,6 +320,8 @@ public class MainBean implements Serializable{
 		
 	    if (lengthOfCurrentActivitiesList.equals("week")) {activitiesList = activitiesListWeek;}
 	    else if((lengthOfCurrentActivitiesList.equals("month"))) {activitiesList = activitiesListMonth;}
+	    
+	    fillDaysForCalendarHighlighter();
 	}
 	
 	
@@ -385,6 +475,39 @@ public class MainBean implements Serializable{
         }
         
         
+	}
+	
+	
+	private void fillDaysForCalendarHighlighter() {		
+		workDaysForCalendar.clear();
+		vacationDaysForCalendar.clear();
+		sickDaysForCalendar.clear();
+		daysOffForCalendar.clear();
+		for (int i = 0; i < activitiesListMonth.size(); i++) {					
+			if (activitiesListMonth.get(i).getType() != null) {
+				if (activitiesListMonth.get(i).getType().equals("Work day")) {					
+					workDaysForCalendar.add("'" + activitiesListMonth.get(i).getDate() + "'");				
+				}
+				else if (activitiesListMonth.get(i).getType().equals("Vacation")) {
+					vacationDaysForCalendar.add("'" + activitiesListMonth.get(i).getDate() + "'");
+				}
+				else if (activitiesListMonth.get(i).getType().equals("Sick day")) {
+					sickDaysForCalendar.add("'" + activitiesListMonth.get(i).getDate() + "'");
+				}
+				else if (activitiesListMonth.get(i).getType().equals("Day off")) {
+					daysOffForCalendar.add("'" + activitiesListMonth.get(i).getDate() + "'");
+				}
+			}
+			
+		}
+		System.out.println("(My comment) fillDaysForCalendarHighlighter->workDaysForCalendar : " + workDaysForCalendar.toString() );
+		System.out.println("(My comment) fillDaysForCalendarHighlighter->vacationDaysForCalendar : " + vacationDaysForCalendar.toString() );
+		System.out.println("(My comment) fillDaysForCalendarHighlighter->sickDaysForCalendar : " + sickDaysForCalendar.toString() );
+		System.out.println("(My comment) fillDaysForCalendarHighlighter->daysOffForCalendar : " + daysOffForCalendar.toString() );
+		/*for (int i = 0; i < workDaysForCalendar.size(); i++) {
+			System.out.println("(My comment) fillDaysForCalendarHighlighter->workDaysForCalendar[i] : " + workDaysForCalendar.get(i));
+		}*/
+		
 	}
 	
 	

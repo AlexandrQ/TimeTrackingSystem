@@ -40,6 +40,16 @@ public class Activity implements Serializable{
 		this.percentage = percentage;
 		this.status = status;
 	}
+	
+	public Activity(String date, String type, String proportion, String comment, String percentage,  String status) {
+		super();
+		this.date = date;
+		this.type = type;
+		this.proportion = proportion;				
+		this.comment = comment;
+		this.percentage = percentage;
+		this.status = status;
+	}
 
 
 

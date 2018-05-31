@@ -11,10 +11,23 @@ public class User implements Serializable{
 	private String name;
 	private String surname;
 	private String role;
+	private String project;
 	private boolean isLogged = false;
 	
 	
 	
+	public String getProject() {
+		return project;
+	}
+
+
+
+	public void setProject(String project) {
+		this.project = project;
+	}
+
+
+
 	public String getLogin() {
 		return login;
 	}

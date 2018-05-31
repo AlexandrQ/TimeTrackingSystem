@@ -19,20 +19,59 @@
 				width: 80px;
 				height: 35px;
 			}
-			.testMarkDay {
+			.workDaycss {
 				background-color: #00ffff;
+			}
+			.vacationDaycss {
+				background-color: #02ce24;
+			}
+			.sickDaycss {
+				background-color: #ff7802;
+			}
+			.dayOffcss {
+				background-color: #d001ff;
 			}			
 		</style>
 		
 		<script type="text/javascript">
-			function testMarkDaysFunc(date) {      				      				
-      				if(date.toString().includes("Wed")) { 
-      					//document.getElementById("targetLabel1").innerHTML = " newDate =  " + new Date(2018, 4, 23).getTime() + "   " + new Date(2018, 4, 23);  
-      					//document.getElementById("targetLabel2").innerHTML += "CalendarDate = " + date.getTime() + "    " + date + '\n';      					
-        				return [true, 'testMarkDay'];
-      				} else {
-      					return [true, '']
-      				}			
+			function testMarkDaysFunc(date) {
+				
+				//document.getElementById("targetLabel1").innerHTML += 'Date now : ' + date.setHours(3)  + '###'; 
+				date.setHours(3);
+				var workDates = #{mainBean.workDaysForCalendar};
+				var vacationDates = #{mainBean.vacationDaysForCalendar};
+				var sickDates = #{mainBean.sickDaysForCalendar};
+				var offDates = #{mainBean.daysOffForCalendar};
+				
+				var cssClass = '';
+		        var workDayClass = 'workDaycss';
+		        var vacationDayClass = 'vacationDaycss';
+		        var sickDayClass = 'sickDaycss';
+		        var dayOffClass = 'dayOffcss';		        
+		        for (var i = 0; i &lt; workDates.length; i++) {
+		        	//document.getElementById("targetLabel1").innerHTML += " workDates[i] =  " + new Date(workDates[i]) + '   ' + new Date(workDates[i]).getTime() +'!!!';
+		        	//document.getElementById("targetLabel2").innerHTML += " date.toString() =  " + date.getTime().toString() + '  Date(workDates[i]).getTime().toString() ' + new Date(workDates[i]).getTime().toString() +'??? ';
+		        	if (date.getTime().toString() == new Date(workDates[i]).getTime().toString()) {
+		        		//document.getElementById("targetLabel3").innerHTML += '++';
+		        		cssClass = 'workDaycss';
+		            }		        	
+		        }
+		        for (var i = 0; i &lt; vacationDates.length; i++) {
+		        	if (date.getTime().toString() == new Date(vacationDates[i]).getTime().toString()) {
+		                cssClass = 'vacationDaycss';
+		            }
+		        }
+		        for (var i = 0; i &lt; sickDates.length; i++) {
+		        	if (date.getTime().toString() == new Date(sickDates[i]).getTime().toString()) {
+		                cssClass = 'sickDaycss';
+		            }
+		        }
+		        for (var i = 0; i &lt; offDates.length; i++) {
+		        	if (date.getTime().toString() == new Date(offDates[i]).getTime().toString()) {
+		                cssClass = 'dayOffcss';
+		            }
+		        }
+		        return [true, cssClass];
   			}
     	</script>
 		
@@ -68,6 +107,10 @@
 					            <span class="ui-separator">
 					                <span class="ui-icon ui-icon-grip-dotted-vertical" />
 					            </span>
+					            <span class="ui-separator">
+					                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+					            </span>
+					            #{mainBean.user.name} #{mainBean.user.surname}
 					        </f:facet>		 
 					        <f:facet name="right">
 					            <p:menuButton value="Options">
@@ -132,7 +175,8 @@
 			</tr>
 		</table> 
 		
-		<div><h:outputLabel id="targetLabel1" value="===" /></div>
-		<div><h:outputLabel id="targetLabel2" value="===" /></div>
+		<div><h:outputLabel id="targetLabel1" value="===1===" /></div>
+		<div><h:outputLabel id="targetLabel2" value="===2===" /></div>
+		<div><h:outputLabel id="targetLabel3" value="===3=== " /></div>
 	</h:body>
 </html>
