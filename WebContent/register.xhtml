@@ -1,0 +1,192 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    >
+ 
+<h:head>
+	<script type="text/javascript" language="javascript">
+			
+			function getRegPageData(){				
+				#{regBean.SelectCurrentUsers()};
+			}
+		
+			function getYearActivity(){				
+				#{vacationBean.getCurrentAtivities()};
+			}
+			
+			function getProjPageData(){				
+				#{projBean.SelectCurrentProjects()};
+			}
+			
+	</script>
+</h:head>
+ 
+<h:body>     	
+	
+	<p:growl id="growl"  showDetail="true" life="3000" />
+		
+	<div align="right" style="font-size: 10px;">
+		<h:panelGrid columns="1" cellpadding="0" border = "0">
+			<h:form>
+				<p:menuButton value="#{vacationBean.mb.getUser().getName()}">
+	          		<p:menuitem value="Logout" action="logout.xhtml" url="logout.xhtml" type="submit" update="" style="font-size: 12px;" />	           						                
+	        	</p:menuButton>
+	        </h:form>
+        </h:panelGrid>
+    </div>
+    
+    <table style="width: 100%; border-style: solid; border-width: 1px; font-size: 10px;">
+		<tr >
+			<td colspan="3" style="border-style: solid; border-width: 1px;">
+				<p:tabMenu activeIndex="2">
+					<p:menuitem value="My Activity" url="myActivity.xhtml">
+						<f:param name="i" value="0" />
+					</p:menuitem>
+					<p:menuitem value="My Vacations" url="myVacations.xhtml" onclick="getYearActivity();">
+						<f:param name="i" value="1" />
+					</p:menuitem>
+					<p:menuitem value="Register user" url="register.xhtml" onclick="getRegPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+						<f:param name="i" value="2" />
+					</p:menuitem>
+					<p:menuitem value="Add project" url="projects.xhtml" onclick="getProjPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+						<f:param name="i" value="3" />
+					</p:menuitem>			
+				</p:tabMenu>
+			</td>					    
+		</tr>
+	</table>
+	<p:tabView id="tabV"  style="font-size: 15px;">
+		<p:tab title="Users list" update="userTable">
+			<h:form id="form">
+				<p:dataTable id="usersTable" var="user" value="#{regBean.currentUsers}" selectionMode="single" selection="#{regBean.selectedUser}" rowKey="#{user.login}">
+					<p:column headerText="Login">								
+						<h:outputText value="#{user.login}" />		               				
+					</p:column>
+					<p:column headerText="Name">
+	             				<h:outputText value="#{user.name}" />               					
+					</p:column>
+					<p:column headerText="Surname">
+	             				<h:outputText value="#{user.surname}" />               					
+					</p:column>
+					<p:column headerText="Project">
+	             				<h:outputText value="#{user.project}" />               					
+					</p:column>
+					<p:column headerText="Position">
+	             				<h:outputText value="#{user.position}" />               					
+					</p:column>
+					<p:column headerText="Degree">
+	             				<h:outputText value="#{user.degree}" />               					
+					</p:column>
+					<p:column headerText="Role">
+	             				<h:outputText value="#{user.role}" />               					
+					</p:column>
+					<p:column headerText="Status">
+	             				<h:outputText value="#{user.status}" />               					
+					</p:column>					
+					<p:column headerText="Register date">
+	             				<h:outputText value="#{user.regDate}" />               					
+					</p:column>
+					
+					<f:facet name="footer">
+	            		<p:commandButton process="usersTable" update="usersTable growl" icon="ui-icon-cancel" value="Disable" action="#{regBean.disableUser()}" >
+	            			<p:confirm header="Confirmation" message="Are you sure that you want to disable this user?" icon="ui-icon-alert" />
+	            		</p:commandButton>
+	            		
+	            		<p:commandButton process="usersTable" update="usersTable growl" icon="ui-icon-unlocked" value="Enable" action="#{regBean.enableUser()}" >
+	            			<p:confirm header="Confirmation" message="Are you sure that you want to enable this user?" icon="ui-icon-alert" />
+	            		</p:commandButton>
+	            		
+	            		<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+					        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					    </p:confirmDialog>
+	        		</f:facet>
+				</p:dataTable>
+		    </h:form>
+		</p:tab>
+        <p:tab title="Registration" >
+        	<div align="center"><h:outputLabel value="Registration" style="font-size:200%;" /></div>
+            <div align="center">
+				<h:form id="regUserForm" >			
+					<p:messages id="msgs" />
+					<h:panelGrid id="panelG" columns="3" cellpadding="5" style="font-size: 20px;">
+			            <h:outputLabel for="login" value="Login:" />
+		            	<p:inputText id="login" value="#{regBean.regUser.login}" required="true" label="login" >
+		            		<f:validateRegex pattern = ".+@.+\..+" />            		
+		                	<p:ajax update="loginMsg" event="keyup" />
+		            	</p:inputText>
+		            	<p:message for="login" id="loginMsg" display="icon" />
+		 
+		            	<h:outputLabel for="password" value="Password:" />
+		            	<p:password id="password" value="#{regBean.regUser.password}" required="true" label="password" feedback="true" match="confirmPassword"/>
+		            	<p:message for="password" id="passwordMsg" display="icon" />
+		            	
+		            	<h:outputLabel for="confirmPassword" value="Confirm password:" />
+		            	<p:password id="confirmPassword" value="#{regBean.regUser.password}" required="true" label="comfirmPassword" />
+		            	<p:message for="confirmPassword" id="confirmPassMsg" display="icon" />
+		            	
+		            	<h:outputLabel for="name" value="Name:" />
+		            	<p:inputText id="name" value="#{regBean.regUser.name}" required="true" label="name">            		
+		            		<f:validateLength minimum="2" />
+		                	<p:ajax update="nameMsg" event="keyup" />
+		            	</p:inputText>
+		            	<p:message for="name" id="nameMsg" display="icon" />  
+		            	
+		            	<h:outputLabel for="surname" value="Surname:" />
+		            	<p:inputText id="surname" value="#{regBean.regUser.surname}" required="true" label="surname">            		
+		            		<f:validateLength minimum="2" />
+		                	<p:ajax update="surnameMsg" event="keyup" />
+		            	</p:inputText>
+		            	<p:message for="surname" id="surnameMsg" display="icon" />
+		            	
+		            	<h:outputLabel for="role" value="Role:" />
+		            	<p:selectOneMenu id="role" value="#{regBean.regUser.role}"  var="role" required="true">							
+							<f:selectItems value="#{regBean.roles}" var="role" itemLabel="#{role}" itemValue="#{role}"/>
+						</p:selectOneMenu>
+						<div></div>
+						
+						<h:outputLabel for="project" value="Project:" />
+		            	<p:selectOneMenu id="project" value="#{regBean.regUser.project}"  var="projectV" required="true">							
+							<f:selectItems value="#{regBean.projects}" var="projectV" itemLabel="#{projectV}" itemValue="#{projectV}"/>
+						</p:selectOneMenu>
+						<div></div>		            	
+		            			                	
+		                <h:outputLabel for="position" value="Position:" />
+		            	<p:selectOneMenu id="position" value="#{regBean.regUser.position}"  var="positionV" required="true">							
+							<f:selectItems value="#{regBean.positions}" var="positionV" itemLabel="#{positionV}" itemValue="#{positionV}"/>
+						</p:selectOneMenu>
+						<div></div>
+						
+						<h:outputLabel for="degree" value="Degree:" />
+		            	<p:selectOneMenu id="degree" value="#{regBean.regUser.degree}"  var="degreeV" required="true">							
+							<f:selectItems value="#{regBean.degrees}" var="degreeV" itemLabel="#{degreeV}" itemValue="#{degreeV}"/>
+						</p:selectOneMenu>
+						<div></div>
+						
+						<h:outputLabel for="status" value="Status:" />
+		            	<p:selectOneMenu id="status" value="#{regBean.regUser.status}"  var="statusV" required="true">							
+							<f:selectItems value="#{regBean.statuses}" var="statusV" itemLabel="#{statusV}" itemValue="#{statusV}"/>
+						</p:selectOneMenu>
+						<div></div>	
+		            	  
+			 
+			            <f:facet name="footer">
+			                <p:commandButton value="Submit" action="#{regBean.register()}" update="growl panelG regUserForm :tabV:form:usersTable" />
+			            </f:facet> 	            
+		        	</h:panelGrid>
+				</h:form>			
+			</div>	
+        </p:tab>				        
+    </p:tabView>
+	
+	   
+</h:body>
+     
+</html>

@@ -22,6 +22,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
+import org.primefaces.event.CellEditEvent;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 
 import dbCon.SingletonDBConnection;
@@ -33,9 +35,11 @@ import entity.User;
 @SessionScoped
 
 public class MainBean implements Serializable{
-
+	
+	private static final long serialVersionUID = 1L;
+	
 	private User user = new User();
-	private ArrayList<Activity> activitiesList = new ArrayList<>();
+	private ArrayList<Activity> activitiesList;
 	private ArrayList<Activity> activitiesListWeek = new ArrayList<>();	
 	private ArrayList<Activity> activitiesListMonth = new ArrayList<>();	
 	private String lengthOfCurrentActivitiesList = "week";
@@ -113,6 +117,10 @@ public class MainBean implements Serializable{
 	}
 
 	public ArrayList<Activity> getActivitiesList() {
+		if(activitiesList==null){
+			System.out.println("(My comment) getActivitiesList()->activitiesList==null");
+			getCurrentAtivities(LocalDate.now());
+	    }	    
 		return activitiesList;
 	}
 
@@ -121,7 +129,7 @@ public class MainBean implements Serializable{
 	}
 
 	public String loggedIn() {				
-		if(UserAutenticate(user.getLogin(), user.getPassword())) {			
+		if(UserAutenticate()) {			
 			user.setLogged(true);
 			getCurrentAtivities(LocalDate.now());				
 			return "myActivity.xhtml?faces-redirect=true";			
@@ -135,26 +143,23 @@ public class MainBean implements Serializable{
 		}
 	}
 	
-	private boolean UserAutenticate(String login, String password) {
+	private boolean UserAutenticate() {			
 			
-			//когда будет готова регистрация, вернуть хеширование пароля
-			/*MessageDigest md = null;
+			MessageDigest md = null;
 			try {
 				md = MessageDigest.getInstance( "SHA-256" );
 			} catch (NoSuchAlgorithmException e1) {			
 				e1.printStackTrace();
 			}
-		    md.update( password.getBytes( StandardCharsets.UTF_8 ) );
+		    md.update( user.getPassword().getBytes( StandardCharsets.UTF_8 ) );
 		    byte[] digest = md.digest();
-		    String Password = String.format( "%064x", new BigInteger( 1, digest ) );	    
-			*/
-		
-			String Password = password;
+		    user.setPassword(String.format( "%064x", new BigInteger( 1, digest ) )); 				
 			
-			String querryStrCount = "SELECT COUNT(user_login) AS Count FROM public.\"users\" WHERE user_login = '" + login + "' AND user_password = '" + Password + "'";
+			String querryStrCount = "SELECT COUNT(user_login) AS Count FROM public.\"users\" WHERE user_login = '" + user.getLogin() + "' AND user_password = '" + user.getPassword() + "' AND user_status = 1";
 			String querryStrUser = "SELECT user_id, user_login, user_password, user_name, user_surname, project_name, user_role_name" + 
 					"	FROM public.users, public.projects, public.user_roles" + 
-					"    WHERE user_login = '" + login + "'" + 
+					"    WHERE user_login = '" + user.getLogin() + "'" + 
+					"    AND user_password = '" + user.getPassword() + "'" +
 					"    AND user_project = project_id" + 					 
 					"    AND user_role = user_role_id";
 			Connection dbConnection = null;
@@ -198,6 +203,7 @@ public class MainBean implements Serializable{
 	
 	
 	private void getCurrentAtivities(LocalDate date) {		
+		if (activitiesList==null) activitiesList = new ArrayList<>();
 		activitiesList.clear();
 		activitiesListWeek.clear();
 		activitiesListMonth.clear();
@@ -535,5 +541,88 @@ public class MainBean implements Serializable{
 		getCurrentAtivities(LocalDate.now());
 	}
 	
+	 /*public void onRowEdit(RowEditEvent event) {
+		Activity obj = (Activity) event.getObject();
+		FacesMessage msg;
+		if (obj.getType() == null) {
+			msg = new FacesMessage("Activity Edited", obj.getDate() + " New day" );
+		}
+		else {
+			if (!obj.getStatus().equals("Approved")) {
+				msg = new FacesMessage("Activity Edited", obj.getComment() + " Update object"  );
+				
+				/*String queryStrUpdate = "UPDATE public.activities" + 
+						"	SET activity_percentage="+ obj.getPercentage() == null ? "" : obj.getPercentage() +" ," + 
+						"        activity_type=(SELECT activity_type_id FROM public.activity_types WHERE activity_type_name = '" + obj.getType() + "' )," + 
+						"        activity_comment = '"+ obj.getComment() == null ? "" : obj.getComment() +"', " + 
+						"        activity_proportion = " + obj.getProportion() + ", " + 
+						"        activity_status = 3" + 
+						"	WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() +"' )" + 
+						"    AND activity_date = '" + obj.getDate() +"'";
+				
+				Connection dbConnection = null;
+				Statement statement = null;
+				    
+			    try {
+				    dbConnection = SingletonDBConnection.getInstance().getConnInst();
+				    statement = dbConnection.createStatement();		
+				    
+				    if (!(statement.executeUpdate(queryStrUpdate) == 1)) {
+				    	System.out.println("(My comment: Update unsuccessful)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"); 
+				    	
+				    }
+				    
+				    if (dbConnection != null) {
+				    	dbConnection.close();	
+				    }				
+				    
+				} catch (SQLException e) {
+				    System.out.println(e.getMessage());	
+				    
+				    if (dbConnection != null) {
+			            try {
+							dbConnection.close();
+						} catch (SQLException ee) {				
+							ee.printStackTrace();
+						}		            
+			        }	
+				} 
+			}
+			else {
+				msg = new FacesMessage("Edit", "Cannot edited this activity"  );
+			}
+			
+		}
+        
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }*/
 	
+	public void onRowEdit(RowEditEvent event) {
+		//System.out.println("My comment: onRowEdit->Activity: " + str);
+		//FacesMessage msg = new FacesMessage("Edit EditString", str);
+       // FacesContext.getCurrentInstance().addMessage(null, msg);
+		// code to save changes
+		FacesMessage msg = new FacesMessage("Edit Cancelled", ((Activity) event.getObject()).getComment());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
+     
+    public void onRowCancel(RowEditEvent event) {
+        FacesMessage msg = new FacesMessage("Edit Cancelled", ((Activity) event.getObject()).getDate());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }	
+    
+    public void onCellEdit(CellEditEvent event) {
+    	System.out.println("My comment: onCellEdit");
+        Object oldValue = event.getOldValue();
+        Object newValue = event.getNewValue();
+        
+         
+        System.out.println("My comment: onCellEdit : Cell Changed Old: " + oldValue + ", New:" + newValue);
+        if(newValue != null && !newValue.equals(oldValue)) {
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell Changed", "Old: " + oldValue + ", New:" + newValue);
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+            
+        }
+    }
+
 }

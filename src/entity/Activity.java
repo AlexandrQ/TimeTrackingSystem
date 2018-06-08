@@ -25,6 +25,7 @@ public class Activity implements Serializable{
 	public Activity(String date) {
 		this.date = date;
 		this.status = "Not filled";
+		this.type = "Not filled";
 	}
 	
 	public Activity(String date, String type, String proportion, String project, String taskGroup, String task,

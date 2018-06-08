@@ -21,11 +21,11 @@
 	 
 	<h:body>  	
 	 
-	 <p:growl id="growl" sticky="true" showDetail="true" life="3000" />
-	
-	   <div align="center">
-	   	         
-				<h:outputLabel value="Login" style="font-size:200%;" />
+		<p:growl id="growl" showDetail="true" life="5000" />
+		 
+		<div align="center"><h:outputLabel value="TIME TRACKING SYSTEM" style="font-size:200%;" /></div>
+		<div align="center">
+			<h:outputLabel value="Login" style="font-size:200%;" />
 				<h:panelGrid columns="1" cellpadding="5">
 					<h:form>
 				        <h:panelGrid columns="2" cellpadding="5">	        
@@ -40,21 +40,8 @@
 				                <p:commandButton value="Login" styleClass="myCustomStyle" action="#{mainBean.loggedIn()}" update="growl"/>				                				                
 				            </f:facet> 
 				        </h:panelGrid>	
-			        </h:form> 	    
-		        
-			    	<f:facet name="footer">	
-			        	<h:form>			
-							<p:commandButton value="Register" action="register.xhtml?faces-redirect=true" onclick="register.xhtml?faces-redirect=true" styleClass="myCustomStyle"/>
-						</h:form> 
-			        </f:facet> 
-			        
-			    	
+			        </h:form>
 			    </h:panelGrid>
-			    
-	   </div>
-		
-	   
-	   
-	</h:body>
-     
+			</div>
+	</h:body>     
 </html>

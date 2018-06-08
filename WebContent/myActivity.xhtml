@@ -30,18 +30,39 @@
 			}
 			.dayOffcss {
 				background-color: #d001ff;
+			}
+			.hiddenLabelForCalendar {
+				font-size: 0.01pt;
 			}			
 		</style>
 		
-		<script type="text/javascript">
+		<script type="text/javascript" language="javascript">
+			
+			function getRegPageData(){				
+				#{regBean.SelectCurrentUsers()};
+			}
+		
+			function getYearActivity(){				
+				#{vacationBean.getCurrentAtivities()};
+			}
+			
+			function getProjPageData(){				
+				#{projBean.SelectCurrentProjects()};
+			}
+			
 			function testMarkDaysFunc(date) {
 				
 				//document.getElementById("targetLabel1").innerHTML += 'Date now : ' + date.setHours(3)  + '###'; 
 				date.setHours(3);
-				var workDates = #{mainBean.workDaysForCalendar};
-				var vacationDates = #{mainBean.vacationDaysForCalendar};
-				var sickDates = #{mainBean.sickDaysForCalendar};
-				var offDates = #{mainBean.daysOffForCalendar};
+				var workDates = document.getElementById("workDaysLabel").innerHTML.replace( /['[\]]/g , '').replace( /\s/g , '').split(',');				
+				var vacationDates = document.getElementById("vacationLabel").innerHTML.replace( /['[\]]/g , '').replace( /\s/g , '').split(',');				
+				var sickDates = document.getElementById("sickDaysLabel").innerHTML.replace( /['[\]]/g , '').replace( /\s/g , '').split(',');
+				var offDates = document.getElementById("daysOffLabel").innerHTML.replace( /['[\]]/g , '').replace( /\s/g , '').split(',');
+				
+				//var workDates = <h:outputText value="#{mainBean.workDaysForCalendar}"/>;
+				//var vacationDates = <h:outputText value="#{mainBean.vacationDaysForCalendar}"/>;
+				//var sickDates = <h:outputText value="#{mainBean.sickDaysForCalendar}"/>;
+				//var offDates = <h:outputText value="#{mainBean.daysOffForCalendar}"/>;
 				
 				var cssClass = '';
 		        var workDayClass = 'workDaycss';
@@ -49,14 +70,11 @@
 		        var sickDayClass = 'sickDaycss';
 		        var dayOffClass = 'dayOffcss';		        
 		        for (var i = 0; i &lt; workDates.length; i++) {
-		        	//document.getElementById("targetLabel1").innerHTML += " workDates[i] =  " + new Date(workDates[i]) + '   ' + new Date(workDates[i]).getTime() +'!!!';
-		        	//document.getElementById("targetLabel2").innerHTML += " date.toString() =  " + date.getTime().toString() + '  Date(workDates[i]).getTime().toString() ' + new Date(workDates[i]).getTime().toString() +'??? ';
-		        	if (date.getTime().toString() == new Date(workDates[i]).getTime().toString()) {
-		        		//document.getElementById("targetLabel3").innerHTML += '++';
+		        	if (date.getTime().toString() == new Date(workDates[i]).getTime().toString()) {		        		
 		        		cssClass = 'workDaycss';
 		            }		        	
 		        }
-		        for (var i = 0; i &lt; vacationDates.length; i++) {
+		        for (var i = 0; i &lt; vacationDates.length; i++) {			        	
 		        	if (date.getTime().toString() == new Date(vacationDates[i]).getTime().toString()) {
 		                cssClass = 'vacationDaycss';
 		            }
@@ -70,7 +88,7 @@
 		        	if (date.getTime().toString() == new Date(offDates[i]).getTime().toString()) {
 		                cssClass = 'dayOffcss';
 		            }
-		        }
+		        }		        
 		        return [true, cssClass];
   			}
     	</script>
@@ -79,20 +97,45 @@
 	 
 	<h:body>
 	
-		<p:growl id="growl" sticky="true" showDetail="true" life="3000" />  
+		<p:growl id="growl" showDetail="true" life="3000" />  
 		
-		<div><h:outputLabel value="Hidden label on hidden page! Only for admin :)" rendered="#{mainBean.user.login == 'admin'}"/></div>		
+								
+			
+		<div align="right" style="font-size: 10px;">
+			<h:panelGrid columns="6" cellpadding="0" border = "0">
+				
+				<p:outputLabel id="workDaysLabel" value="#{mainBean.workDaysForCalendar}" class="hiddenLabelForCalendar"/>
+				<p:outputLabel id="vacationLabel" value="#{mainBean.vacationDaysForCalendar}" class="hiddenLabelForCalendar"/>
+				<p:outputLabel id="sickDaysLabel" value="#{mainBean.sickDaysForCalendar}" class="hiddenLabelForCalendar"/>
+				<p:outputLabel id="daysOffLabel" value="#{mainBean.daysOffForCalendar}" class="hiddenLabelForCalendar"/>	
+			
+				<h:form>
+					<p:menuButton value="#{vacationBean.mb.getUser().getName()}">
+		           		<p:menuitem value="Logout" action="logout.xhtml" url="logout.xhtml" type="submit" update="" style="font-size: 12px;" />	           						                
+		            </p:menuButton>
+	            </h:form>
+            </h:panelGrid>
+        </div>
+		
 		<table style="width:100%; border-style: solid; border-width: 1px; font-size: 10px;">
 			<tr >
 				<th colspan="2" style="border-style: solid; border-width: 1px;">
-					<p:tabMenu activeIndex="0">
-						<p:menuitem value="My Activity" url="myActivity.xhtml">
-							<f:param name="i" value="0" />
-						</p:menuitem>
-						<p:menuitem value="My Vacations" url="myVacations.xhtml">
-							<f:param name="i" value="1" />
-						</p:menuitem>			
-					</p:tabMenu>
+					<h:form>
+						<p:tabMenu activeIndex="0">
+							<p:menuitem value="My Activity" url="myActivity.xhtml">
+								<f:param name="i" value="0" />
+							</p:menuitem>
+							<p:menuitem value="My Vacations" url="myVacations.xhtml" onclick="getYearActivity();" >
+								<f:param name="i" value="1" />
+							</p:menuitem>	
+							<p:menuitem value="Register user" url="register.xhtml" onclick="getRegPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+								<f:param name="i" value="2" />
+							</p:menuitem>
+							<p:menuitem value="Add project" url="projects.xhtml" onclick="getProjPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+								<f:param name="i" value="3" />
+							</p:menuitem>		
+						</p:tabMenu>						
+					</h:form>
 				</th>				    
 			</tr>
 			<tr>
@@ -123,45 +166,79 @@
 				</td>
 				<td rowspan="2" style="border-style: solid; border-width: 1px; width: 70px;  vertical-align: top;">
 					<h:form>
-			   			<p:calendar id="event" value="#{calendarBean.date1}" mode="inline"  beforeShowDay="testMarkDaysFunc" >
-			   				<p:ajax event="dateSelect" listener="#{mainBean.onDateSelect}" update="activityTable" />
+			   			<p:calendar id="eventCalendar" value="#{calendarBean.date1}" mode="inline"  beforeShowDay="testMarkDaysFunc" >
+			   				<p:ajax event="dateSelect" listener="#{mainBean.onDateSelect}" update="activityTable eventCalendar workDaysLabel vacationLabel sickDaysLabel daysOffLabel" />
 			   			</p:calendar>
    					</h:form>
 				</td>				    
 			</tr>
 			<tr>
 				<td style="border-style: solid; width: 85%; border-width: 1px;">
-			    	<p:dataTable id="activityTable" var="activity" value="#{mainBean.activitiesList}"  >
-						<p:column headerText="Date">	
+			    	<p:dataTable id="activityTable" var="activity" value="#{mainBean.activitiesList}" editable="true" >
+			    	
+			    		<p:ajax event="rowEdit" listener="#{mainBean.onRowEdit}" update="growl activityTable" />
+       					<p:ajax event="rowEditCancel" listener="#{mainBean.onRowCancel}" update="growl" />
+       					<p:ajax event="cellEdit" listener="#{mainBean.onCellEdit}" update="growl"/>
+			    	
+						<p:column headerText="Date">								
 							<h:outputText value="#{activity.date}" />		               				
 						</p:column>
-						<p:column headerText="Activity type">	
-							<h:outputText value="#{activity.type}" />
+						<p:column headerText="Activity type">
+							<p:cellEditor>
+               					<f:facet name="output"><h:outputText value="#{activity.type}" /></f:facet>
+               					<f:facet name="input"><p:inputText id="typeInput" binding="#{typeInput1}" value="#{activity.type}" /></f:facet>
+           					</p:cellEditor>
 						</p:column>
 						<p:column headerText="Proportion">
-							<h:outputText value="#{activity.proportion}" />	 						
+							<p:cellEditor>
+               					<f:facet name="output"><h:outputText value="#{activity.proportion}" /></f:facet>
+               					<f:facet name="input"><p:inputText id="proportionInput" value="#{activity.proportion}" /></f:facet>
+           					</p:cellEditor>													
 						</p:column>
 						<p:column headerText="Project">
-							<h:outputText value="#{activity.project}" />	 						
+							<p:cellEditor>
+               					<f:facet name="output"><h:outputText value="#{activity.project}" /></f:facet>
+               					<f:facet name="input"><p:inputText id="projectInput" value="#{activity.project}" /></f:facet>
+           					</p:cellEditor>									 						
 						</p:column>	 	
-						<p:column headerText="Task Group">
-							<h:outputText value="#{activity.taskGroup}" />	 						
+						<p:column headerText="Task Group">							
+							<p:cellEditor>
+               					<f:facet name="output"><h:outputText value="#{activity.taskGroup}" /></f:facet>
+               					<f:facet name="input"><p:inputText id="taskGroupInput" value="#{activity.taskGroup}" /></f:facet>
+           					</p:cellEditor>	 						
 						</p:column>	
 						<p:column headerText="Task">
-							<h:outputText value="#{activity.task}" />	 						
+							<p:cellEditor>
+               					<f:facet name="output"><h:outputText value="#{activity.task}" /></f:facet>
+               					<f:facet name="input"><p:inputText id="taskInput" value="#{activity.task}" /></f:facet>
+           					</p:cellEditor>								 						
 						</p:column>	
 						<p:column headerText="Comment">
-							<h:outputText value="#{activity.comment}" />	 						
+							<p:cellEditor>
+               					<f:facet name="output"><h:outputText value="#{activity.comment}" /></f:facet>
+               					<f:facet name="input"><p:inputText id="commentInput" value="#{activity.comment}" /></f:facet>
+           					</p:cellEditor>													
 						</p:column>	
 						<p:column headerText="%" style="width: 20px;">
-							<h:outputText value="#{activity.percentage}" />	 						
+							<p:cellEditor>
+               					<f:facet name="output"><h:outputText value="#{activity.percentage}" /></f:facet>
+               					<f:facet name="input"><p:inputText id="percentageInput" value="#{activity.percentage}" /></f:facet>
+           					</p:cellEditor>								 						
 						</p:column>	
 						<p:column headerText="Status">
-							<h:outputText value="#{activity.status}" />	 						
-						</p:column>		
-						<p:column headerText="Approve btn">
-							<h:outputText value="Approve btn" />	 						
+							<p:cellEditor>
+               					<f:facet name="output"><h:outputText value="#{activity.status}" /></f:facet>
+               					<f:facet name="input"><p:inputText id="statusInput" value="#{activity.status}" /></f:facet>
+           					</p:cellEditor>								 						
 						</p:column>
+						<p:column style="width:32px">
+           					<p:rowEditor />
+       					</p:column>		
+						<!--  <p:column headerText="Approve btn">
+							<h:outputText value="Approve btn" />	 						
+						</p:column>  --> 
+						
+						
 					</p:dataTable>
 				</td>				    				    
 			</tr>
@@ -178,5 +255,8 @@
 		<div><h:outputLabel id="targetLabel1" value="===1===" /></div>
 		<div><h:outputLabel id="targetLabel2" value="===2===" /></div>
 		<div><h:outputLabel id="targetLabel3" value="===3=== " /></div>
+		
+		
+		
 	</h:body>
 </html>

@@ -8,62 +8,221 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
     >
  
 	<h:head>
-		<title>My Vacations</title>	
+		<title>My Vacations</title>
+		<script type="text/javascript" language="javascript">
+		
+			function getRegPageData(){				
+				#{regBean.SelectCurrentUsers()};
+			}
+			
+			function getYearActivity(){				
+				#{vacationBean.getCurrentAtivities()};
+			}
+			
+			function getProjPageData(){				
+				#{projBean.SelectCurrentProjects()};
+			}
+			
+			function fillTD(){
+				//var cells = document.getElementsByClassName('status');
+				var cells = document.getElementsByTagName('td');
+				for (var i = 1; i &lt; cells.length; i++) {
+					//cells[i].classList.add('testFuncClass');
+					cells[i].className += " testtesttest";
+					//cells[i].classList.remove('status');
+					document.getElementById("targetLabel1").innerHTML += cells[i].classList.contains("status");
+					//document.getElementById("targetLabel2").innerHTML += cells[i].classList.contains("testFuncClass");
+					console.log(cells[i].classList);
+				  }	
+			}
+		</script>
+		<style type="text/css">
+   			TABLE {
+    			table-layout: fixed;
+  			 }
+  			 .testFuncClass {
+  			 	background-color:#00f7f3;
+  			 }
+  			 .wd_class {
+  			 	background-color:#00f7f3;
+  			 }
+  			 .vac_class	{
+  			 	background-color:#04f700;
+  			 }
+  			 .sck_class {
+  			 	background-color:#f77300;
+  			 }
+  			 .nf_class {
+  			 	background-color:#ffffff;
+  			 }
+  			 .ui-datepicker {
+  			 	width: 98%;
+  			 	height: 220px;
+  			 }
+  			 .ui-datepicker-table{
+  			 	height: 100%;
+  			 }
+  			 
+  			 
+  		</style>
+  		
+		
 	</h:head>
 	 
 	<h:body>  	
 	 
-		<p>Hello!</p>
+		<div align="right" style="font-size: 10px;">
+			<h:panelGrid columns="1" cellpadding="0" border = "0">
+				<h:form>
+					<p:menuButton value="#{vacationBean.mb.getUser().getName()}">
+		           		<p:menuitem value="Logout" action="logout.xhtml" url="logout.xhtml" type="submit" update="" style="font-size: 12px;" />	           						                
+		            </p:menuButton>
+	            </h:form>
+	        </h:panelGrid>
+        </div>
 		 
-		<table style="width:100%; border-style: solid; border-width: 1px; font-size: 10px;">
+		<table style="width: 100%; border-style: solid; border-width: 1px; font-size: 10px;">
 			<tr >
-				<th colspan="3" style="border-style: solid; border-width: 1px;">
+				<td colspan="3" style="border-style: solid; border-width: 1px;">
 					<p:tabMenu activeIndex="1">
 						<p:menuitem value="My Activity" url="myActivity.xhtml">
 							<f:param name="i" value="0" />
 						</p:menuitem>
-						<p:menuitem value="My Vacations" url="myVacations.xhtml">
+						<p:menuitem value="My Vacations" url="myVacations.xhtml" onclick="getYearActivity();">
 							<f:param name="i" value="1" />
+						</p:menuitem>
+						<p:menuitem value="Register user" url="register.xhtml" onclick="getRegPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+							<f:param name="i" value="2" />
+						</p:menuitem>
+						<p:menuitem value="Add project" url="projects.xhtml" onclick="getProjPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+							<f:param name="i" value="3" />
 						</p:menuitem>			
 					</p:tabMenu>
-				</th>					    
+				</td>					    
 			</tr>
 			<tr>
-				<th colspan="2" style="border-style: solid; border-width: 1px;">	
-					AAA
-				</th>
-				<th rowspan="3" style="border-style: solid; border-width: 1px;">
-					BBB	
-				</th>
+				<td colspan="2" style="border-style: solid; border-width: 1px;">	
+					<h:form>
+						<p:toolbar>
+					        <f:facet name="left">
+					            <p:commandButton id="addB" type="submit" value="Add"  update=""/>
+					 
+					            <p:commandButton id="editB" type="submit" value="Edit"  update=""/>
+					 
+					            <span class="ui-separator">
+					                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+					            </span>
+					            <span class="ui-separator">
+					                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+					            </span>
+					            #{vacationBean.mb.getUser().getName()} #{vacationBean.mb.getUser().getSurname()}
+					        </f:facet>		 
+					        <f:facet name="right">
+					            <p:menuButton value="Options">
+					            	 <p:menuitem value="Add" update=""  />
+					            	 <p:menuitem value="Edit" update=""  />					                
+					            </p:menuButton>
+					        </f:facet>					 
+						</p:toolbar>
+					</h:form>
+				</td>
+				<td valign="top" rowspan="3" style="border-style: solid; border-width: 1px;">
+					<h:form>
+			   			<p:calendar id="eventCalendar" value="#{calendarBean.date1}" mode="inline"  style="font-size: 14px;">
+			   				<p:ajax event="dateSelect" update="" />
+			   			</p:calendar>
+   					</h:form>	
+				</td>
 			</tr>
 			<tr>
-				<th style="border-style: solid; border-width: 1px;">	
-					CCC
-				</th>
-				<th style="border-style: solid; border-width: 1px;">
-					DDD	
-				</th>
+				<td style="border-style: solid; border-width: 1px;">	
+					<p:tabView>
+				        <p:tab title="Future vacations">
+				            <h:panelGrid columns="2" cellpadding="10">				                
+				                <h:outputText
+				                    value="The story begins as Don Vito Corleone, the head of a New York Mafia family, oversees his daughter's wedding. 
+				                    His beloved son Michael has just come home from the war, but does not intend to become part of his father's business.
+				                    Through Michael's life the nature of the family business becomes clear. The business of the family is just like the head of the family, kind and benevolent to those who give respect, 
+				                    but given to ruthless violence whenever anything stands against the good of the family." />
+				            </h:panelGrid>
+				        </p:tab>				        
+				    </p:tabView>
+				</td>
+				<td style="border-style: solid; border-width: 1px;">
+					<p:tabView>
+				        <p:tab title="Past vacations">
+				            <h:panelGrid columns="2" cellpadding="10">				                
+				                <h:outputText
+				                    value="The story begins as Don Vito Corleone, the head of a New York Mafia family, oversees his daughter's wedding. 
+				                    His beloved son Michael has just come home from the war, but does not intend to become part of his father's business.
+				                    Through Michael's life the nature of the family business becomes clear. The business of the family is just like the head of the family, kind and benevolent to those who give respect, 
+				                    but given to ruthless violence whenever anything stands against the good of the family." />
+				            </h:panelGrid>
+				        </p:tab>				        
+				    </p:tabView>	
+				</td>
 			</tr>
 			<tr>
-				<th colspan="2" style="border-style: solid; border-width: 1px;">
-					EEE	
-				</th>				
+				<td colspan="2" style="border-style: solid; border-width: 1px;">					
+					<p:tabView>					
+				        <p:tab title="Calendar">
+				            <div style="overflow-x:auto; width: 100%;">
+								<table border="1" style="width: 100%;">
+									<tr>
+			            				<ui:repeat value="#{vacationBean.monthLengthList}" var="data4" >			            					
+					                		<td colspan="#{data4.length}" style="width: 700px; height: 20px; font-size: 10px;">
+					                    		#{data4.month} 
+					                		</td>			                				                		
+			            				</ui:repeat>
+			            			</tr>
+			            			<tr>
+			            				<ui:repeat value="#{vacationBean.numbersOfDaysOfWeekYear}" var="data3" >			            					
+					                		<td  style="width: 20px; height: 20px; font-size: 10px;">
+					                    		#{data3}
+					                		</td>			                				                		
+			            				</ui:repeat>
+			            			</tr>
+			            			<tr>
+			            				<ui:repeat value="#{vacationBean.daysOfWeekInYear}" var="data2" >			            					
+					                		<td  style="width: 20px; height: 20px; font-size: 10px;">
+					                    		#{data2}
+					                		</td>			                				                		
+			            				</ui:repeat>
+			            			</tr>
+			            			<tr>
+			            				<ui:repeat value="#{vacationBean.classesListYear}" var="data" >			            					
+					                		<td class="#{data}"  style="width: 20px; height: 20px; font-size: 0.01px;">
+					                    		
+					                		</td>			                				                		
+			            				</ui:repeat>
+			            			</tr>			            			
+			          			</table>
+	          				</div>				        
+				        </p:tab>				        				        
+				    </p:tabView>
+				</td>				
 			</tr>
 			<tr>
-				<th style="border-style: solid; border-width: 1px;">
+				<td style="border-style: solid; border-width: 1px;">
 					FFF
-				</th>
-				<th style="border-style: solid; border-width: 1px;">
+				</td>
+				<td style="border-style: solid; border-width: 1px;">
 					JJJ
-				</th>
-				<th style="border-style: solid; border-width: 1px;">
+				</td>
+				<td style="border-style: solid; border-width: 1px;">
 					HHH
-				</th>				
+				</td>				
 			</tr>
 		</table>
+		
+		<div><h:outputLabel id="targetLabel1" value="===1===" /></div>
+		<div><h:outputLabel id="targetLabel2" value="===2===" /></div>
+					
+				
 		
 	</h:body>     
 </html>

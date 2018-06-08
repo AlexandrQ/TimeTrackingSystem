@@ -40,16 +40,20 @@ public class UsersFilter implements Filter {
 		String url = req.getRequestURI();		
 		
 		if (session == null || !session.getUser().isLogged()) {
-			if(url.indexOf("/myActivity.xhtml") >= 0 || url.indexOf("/logout.xhtml") >= 0 || url.indexOf("/myVacations.xhtml") >= 0) {
+			if(url.indexOf("/myActivity.xhtml") >= 0 || url.indexOf("/logout.xhtml") >= 0 || url.indexOf("/myVacations.xhtml") >= 0 
+					|| url.indexOf("/register.xhtml") >= 0 || url.indexOf("/projects.xhtml") >= 0) {
 				resp.sendRedirect(req.getServletContext().getContextPath() + "/login.xhtml");
 			} else {
 				chain.doFilter(request, response);
 			}
 		} else {
-			if (url.indexOf("/register.xhtml") >= 0 || url.indexOf("/login.xhtml") >= 0) {
+			if (url.indexOf("/login.xhtml") >= 0) {
 				resp.sendRedirect(req.getServletContext().getContextPath() + "/myActivity.xhtml");
 			} else if(url.indexOf("/logout.xhtml") >= 0) {
 				req.getSession().removeAttribute("mainBean");
+				req.getSession().removeAttribute("vacationBean");
+				req.getSession().removeAttribute("regBean");
+				req.getSession().removeAttribute("projBean");
 				resp.sendRedirect(req.getServletContext().getContextPath() + "/login.xhtml");
 			} else {
 				chain.doFilter(request, response);

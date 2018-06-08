@@ -2,8 +2,6 @@ package entity;
 
 import java.io.Serializable;
 
-//@ManagedBean(name = "user")
-//@SessionScoped
 
 public class User implements Serializable{
 	private String login;
@@ -12,10 +10,62 @@ public class User implements Serializable{
 	private String surname;
 	private String role;
 	private String project;
+	private String regDate;
+	private String position;
+	private String degree;
+	private String status;
 	private boolean isLogged = false;
 	
 	
 	
+	public String getDegree() {
+		return degree;
+	}
+
+
+
+	public void setDegree(String degree) {
+		this.degree = degree;
+	}
+
+
+
+	public String getStatus() {
+		return status;
+	}
+
+
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+
+
+	public String getPosition() {
+		return position;
+	}
+
+
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
+
+
+	public String getRegDate() {
+		return regDate;
+	}
+
+
+
+	public void setRegDate(String date) {
+		this.regDate = date;
+	}
+
+
+
 	public String getProject() {
 		return project;
 	}
