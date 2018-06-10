@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 
 public class User implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String login;
 	private String password;
 	private String name;
@@ -14,10 +18,23 @@ public class User implements Serializable{
 	private String position;
 	private String degree;
 	private String status;
+	private String gender;
 	private boolean isLogged = false;
 	
 	
 	
+	public String getGender() {
+		return gender;
+	}
+
+
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+
+
 	public String getDegree() {
 		return degree;
 	}

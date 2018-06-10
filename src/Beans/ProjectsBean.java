@@ -1,5 +1,6 @@
 package Beans;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -24,8 +25,12 @@ import entity.User;
 
 @ManagedBean(name = "projBean")
 @ViewScoped
-public class ProjectsBean {
+public class ProjectsBean implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String newProject;
 	private String selectedProject;
 	private List<String> currentProjects = new ArrayList<>();

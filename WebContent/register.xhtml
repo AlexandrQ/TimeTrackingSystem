@@ -11,6 +11,12 @@
     >
  
 <h:head>
+	<title>Register</title>
+	<style type="text/css">
+			body {
+			    background-color: #EFFBFB;
+			}			
+	</style>
 	<script type="text/javascript" language="javascript">
 			
 			function getRegPageData(){				
@@ -25,7 +31,11 @@
 				#{projBean.SelectCurrentProjects()};
 			}
 			
-	</script>
+			function getACPageData(){				
+				#{confirmBean.selectUnconfirmedActivies()};
+			}
+			
+	</script>	
 </h:head>
  
 <h:body>     	
@@ -42,9 +52,9 @@
         </h:panelGrid>
     </div>
     
-    <table style="width: 100%; border-style: solid; border-width: 1px; font-size: 10px;">
+    <table style="width: 100%; border-style: none; font-size: 10px;">
 		<tr >
-			<td colspan="3" style="border-style: solid; border-width: 1px;">
+			<td colspan="3" style="border-style: none;">
 				<p:tabMenu activeIndex="2">
 					<p:menuitem value="My Activity" url="myActivity.xhtml">
 						<f:param name="i" value="0" />
@@ -57,16 +67,19 @@
 					</p:menuitem>
 					<p:menuitem value="Add project" url="projects.xhtml" onclick="getProjPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 						<f:param name="i" value="3" />
+					</p:menuitem>
+					<p:menuitem value="Unconfirmed activity" url="activityConfirmation.xhtml" onclick="getACPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+						<f:param name="i" value="4" />
 					</p:menuitem>			
 				</p:tabMenu>
 			</td>					    
 		</tr>
 	</table>
-	<p:tabView id="tabV"  style="font-size: 15px;">
+	<p:tabView id="tabV"  style="font-size: 15px; background-color: #EFFBFB; border-style: none;">
 		<p:tab title="Users list" update="userTable">
 			<h:form id="form">
 				<p:dataTable id="usersTable" var="user" value="#{regBean.currentUsers}" selectionMode="single" selection="#{regBean.selectedUser}" rowKey="#{user.login}">
-					<p:column headerText="Login">								
+					<p:column headerText="Login" style="width:180px;">								
 						<h:outputText value="#{user.login}" />		               				
 					</p:column>
 					<p:column headerText="Name">
@@ -75,10 +88,13 @@
 					<p:column headerText="Surname">
 	             				<h:outputText value="#{user.surname}" />               					
 					</p:column>
+					<p:column headerText="Gender">
+	             				<h:outputText value="#{user.gender}" />               					
+					</p:column>
 					<p:column headerText="Project">
 	             				<h:outputText value="#{user.project}" />               					
 					</p:column>
-					<p:column headerText="Position">
+					<p:column headerText="Position" style="width:160px;">
 	             				<h:outputText value="#{user.position}" />               					
 					</p:column>
 					<p:column headerText="Degree">
@@ -111,7 +127,7 @@
 				</p:dataTable>
 		    </h:form>
 		</p:tab>
-        <p:tab title="Registration" >
+        <p:tab title="Registration">
         	<div align="center"><h:outputLabel value="Registration" style="font-size:200%;" /></div>
             <div align="center">
 				<h:form id="regUserForm" >			
@@ -146,32 +162,39 @@
 		            	</p:inputText>
 		            	<p:message for="surname" id="surnameMsg" display="icon" />
 		            	
+		            	<h:outputLabel for="gender" value="Gender:" />
+		            	<p:selectOneMenu id="gender" value="#{regBean.regUser.gender}"  required="true" style="width:80%;">
+		            		<f:selectItem itemLabel="Male" itemValue="Male" />
+		            		<f:selectItem itemLabel="Female" itemValue="Female" />							
+						</p:selectOneMenu>
+						<div></div>
+		            	
 		            	<h:outputLabel for="role" value="Role:" />
-		            	<p:selectOneMenu id="role" value="#{regBean.regUser.role}"  var="role" required="true">							
+		            	<p:selectOneMenu id="role" value="#{regBean.regUser.role}"  var="role" required="true" style="width:80%;">							
 							<f:selectItems value="#{regBean.roles}" var="role" itemLabel="#{role}" itemValue="#{role}"/>
 						</p:selectOneMenu>
 						<div></div>
 						
 						<h:outputLabel for="project" value="Project:" />
-		            	<p:selectOneMenu id="project" value="#{regBean.regUser.project}"  var="projectV" required="true">							
+		            	<p:selectOneMenu id="project" value="#{regBean.regUser.project}"  var="projectV" required="true" style="width:80%;">							
 							<f:selectItems value="#{regBean.projects}" var="projectV" itemLabel="#{projectV}" itemValue="#{projectV}"/>
 						</p:selectOneMenu>
 						<div></div>		            	
 		            			                	
 		                <h:outputLabel for="position" value="Position:" />
-		            	<p:selectOneMenu id="position" value="#{regBean.regUser.position}"  var="positionV" required="true">							
+		            	<p:selectOneMenu id="position" value="#{regBean.regUser.position}"  var="positionV" required="true" style="width:80%;">							
 							<f:selectItems value="#{regBean.positions}" var="positionV" itemLabel="#{positionV}" itemValue="#{positionV}"/>
 						</p:selectOneMenu>
 						<div></div>
 						
 						<h:outputLabel for="degree" value="Degree:" />
-		            	<p:selectOneMenu id="degree" value="#{regBean.regUser.degree}"  var="degreeV" required="true">							
+		            	<p:selectOneMenu id="degree" value="#{regBean.regUser.degree}"  var="degreeV" required="true" style="width:80%;">							
 							<f:selectItems value="#{regBean.degrees}" var="degreeV" itemLabel="#{degreeV}" itemValue="#{degreeV}"/>
 						</p:selectOneMenu>
 						<div></div>
 						
 						<h:outputLabel for="status" value="Status:" />
-		            	<p:selectOneMenu id="status" value="#{regBean.regUser.status}"  var="statusV" required="true">							
+		            	<p:selectOneMenu id="status" value="#{regBean.regUser.status}"  var="statusV" required="true" style="width:80%;">							
 							<f:selectItems value="#{regBean.statuses}" var="statusV" itemLabel="#{statusV}" itemValue="#{statusV}"/>
 						</p:selectOneMenu>
 						<div></div>	

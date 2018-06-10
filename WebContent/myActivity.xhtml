@@ -13,12 +13,21 @@
 	<h:head>
 		<title>My Activity</title>
 		<style>
+			body {
+			    background-color: #EFFBFB;
+			}
 			.ui-datepicker td {
 				/*background-color: #dd1193;			*/	
 				/* font-size: 100%; */
 				width: 80px;
 				height: 35px;
 			}
+			.ui-datepicker {
+  			 	width: 98%;  			 	
+  			 }
+  			 .ui-datepicker-table{
+  			 	height: 100%;
+  			 }
 			.workDaycss {
 				background-color: #00ffff;
 			}
@@ -31,12 +40,17 @@
 			.dayOffcss {
 				background-color: #d001ff;
 			}
+			.weekendcss {
+				background-color: #DCF1F9;
+			}
 			.hiddenLabelForCalendar {
 				font-size: 0.01pt;
-			}			
+			}
+			
+						
 		</style>
 		
-		<script type="text/javascript" language="javascript">
+		<script type="text/javascript" language="javascript">	
 			
 			function getRegPageData(){				
 				#{regBean.SelectCurrentUsers()};
@@ -50,14 +64,21 @@
 				#{projBean.SelectCurrentProjects()};
 			}
 			
+			function getACPageData(){				
+				#{confirmBean.selectUnconfirmedActivies()};
+			}
+			
 			function testMarkDaysFunc(date) {
 				
 				//document.getElementById("targetLabel1").innerHTML += 'Date now : ' + date.setHours(3)  + '###'; 
+				
 				date.setHours(3);
 				var workDates = document.getElementById("workDaysLabel").innerHTML.replace( /['[\]]/g , '').replace( /\s/g , '').split(',');				
 				var vacationDates = document.getElementById("vacationLabel").innerHTML.replace( /['[\]]/g , '').replace( /\s/g , '').split(',');				
 				var sickDates = document.getElementById("sickDaysLabel").innerHTML.replace( /['[\]]/g , '').replace( /\s/g , '').split(',');
 				var offDates = document.getElementById("daysOffLabel").innerHTML.replace( /['[\]]/g , '').replace( /\s/g , '').split(',');
+				var weekendDates = document.getElementById("weekendLabel").innerHTML.replace( /['[\]]/g , '').replace( /\s/g , '').split(',');				
+				
 				
 				//var workDates = <h:outputText value="#{mainBean.workDaysForCalendar}"/>;
 				//var vacationDates = <h:outputText value="#{mainBean.vacationDaysForCalendar}"/>;
@@ -68,7 +89,14 @@
 		        var workDayClass = 'workDaycss';
 		        var vacationDayClass = 'vacationDaycss';
 		        var sickDayClass = 'sickDaycss';
-		        var dayOffClass = 'dayOffcss';		        
+		        var dayOffClass = 'dayOffcss';
+		        var weekendClass = 'weekendcss';
+		        
+		        for (var i = 0; i &lt; weekendDates.length; i++) {
+		        	if (date.getTime().toString() == new Date(weekendDates[i]).getTime().toString()) {		        		
+		        		cssClass = 'weekendcss';
+		            }		        	
+		        }
 		        for (var i = 0; i &lt; workDates.length; i++) {
 		        	if (date.getTime().toString() == new Date(workDates[i]).getTime().toString()) {		        		
 		        		cssClass = 'workDaycss';
@@ -107,7 +135,8 @@
 				<p:outputLabel id="workDaysLabel" value="#{mainBean.workDaysForCalendar}" class="hiddenLabelForCalendar"/>
 				<p:outputLabel id="vacationLabel" value="#{mainBean.vacationDaysForCalendar}" class="hiddenLabelForCalendar"/>
 				<p:outputLabel id="sickDaysLabel" value="#{mainBean.sickDaysForCalendar}" class="hiddenLabelForCalendar"/>
-				<p:outputLabel id="daysOffLabel" value="#{mainBean.daysOffForCalendar}" class="hiddenLabelForCalendar"/>	
+				<p:outputLabel id="daysOffLabel" value="#{mainBean.daysOffForCalendar}" class="hiddenLabelForCalendar"/>
+				<p:outputLabel id="weekendLabel" value="#{mainBean.weekends}" class="hiddenLabelForCalendar"/>	
 			
 				<h:form>
 					<p:menuButton value="#{vacationBean.mb.getUser().getName()}">
@@ -133,6 +162,9 @@
 							</p:menuitem>
 							<p:menuitem value="Add project" url="projects.xhtml" onclick="getProjPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 								<f:param name="i" value="3" />
+							</p:menuitem>
+							<p:menuitem value="Unconfirmed activity" url="activityConfirmation.xhtml" onclick="getACPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+								<f:param name="i" value="4" />
 							</p:menuitem>		
 						</p:tabMenu>						
 					</h:form>
@@ -143,9 +175,9 @@
 					<h:form>    
 					    <p:toolbar>
 					        <f:facet name="left">
-					            <p:commandButton id="weekB" type="submit" value="Week"  actionListener="#{mainBean.showWeekActions}" update="activityTable"/>
+					            <p:commandButton id="weekB" type="submit" value="Week"  actionListener="#{mainBean.showWeekActions}" update=":tForm:activityTable"/>
 					 
-					            <p:commandButton id="monthB" type="submit" value="Month"  actionListener="#{mainBean.showMonthActions}" update="activityTable"/>
+					            <p:commandButton id="monthB" type="submit" value="Month"  actionListener="#{mainBean.showMonthActions}" update=":tForm:activityTable"/>
 					 
 					            <span class="ui-separator">
 					                <span class="ui-icon ui-icon-grip-dotted-vertical" />
@@ -157,8 +189,8 @@
 					        </f:facet>		 
 					        <f:facet name="right">
 					            <p:menuButton value="Options">
-					            	 <p:menuitem value="Week" actionListener="#{mainBean.showWeekActions}" update="activityTable" icon="ui-icon-disk" />
-					            	 <p:menuitem value="Month" actionListener="#{mainBean.showMonthActions}" update="activityTable" icon="ui-icon-disk" />					                
+					            	 <p:menuitem value="Week" actionListener="#{mainBean.showWeekActions}" update=":tForm:activityTable" icon="ui-icon-disk" />
+					            	 <p:menuitem value="Month" actionListener="#{mainBean.showMonthActions}" update=":tForm:activityTable" icon="ui-icon-disk" />					                
 					            </p:menuButton>
 					        </f:facet>					 
 					    </p:toolbar>
@@ -167,79 +199,132 @@
 				<td rowspan="2" style="border-style: solid; border-width: 1px; width: 70px;  vertical-align: top;">
 					<h:form>
 			   			<p:calendar id="eventCalendar" value="#{calendarBean.date1}" mode="inline"  beforeShowDay="testMarkDaysFunc" >
-			   				<p:ajax event="dateSelect" listener="#{mainBean.onDateSelect}" update="activityTable eventCalendar workDaysLabel vacationLabel sickDaysLabel daysOffLabel" />
+			   				<p:ajax event="dateSelect" listener="#{mainBean.onDateSelect}" update=":tForm:activityTable eventCalendar workDaysLabel vacationLabel sickDaysLabel daysOffLabel" />
 			   			</p:calendar>
    					</h:form>
 				</td>				    
 			</tr>
 			<tr>
 				<td style="border-style: solid; width: 85%; border-width: 1px;">
+				<h:form id="tForm">
 			    	<p:dataTable id="activityTable" var="activity" value="#{mainBean.activitiesList}" editable="true" >
 			    	
 			    		<p:ajax event="rowEdit" listener="#{mainBean.onRowEdit}" update="growl activityTable" />
        					<p:ajax event="rowEditCancel" listener="#{mainBean.onRowCancel}" update="growl" />
        					<p:ajax event="cellEdit" listener="#{mainBean.onCellEdit}" update="growl"/>
 			    	
-						<p:column headerText="Date">								
+						<p:column headerText="Date" style="width:80px;">								
 							<h:outputText value="#{activity.date}" />		               				
 						</p:column>
+						
+						
 						<p:column headerText="Activity type">
 							<p:cellEditor>
                					<f:facet name="output"><h:outputText value="#{activity.type}" /></f:facet>
-               					<f:facet name="input"><p:inputText id="typeInput" binding="#{typeInput1}" value="#{activity.type}" /></f:facet>
+               					<f:facet name="input">               						
+               						<p:selectOneMenu id="typeInput" value="#{activity.type}"  var="type" required="true" style="width:80%;">							
+										<f:selectItems value="#{mainBean.typesL}" var="type" itemLabel="#{type}" itemValue="#{type}"/>
+									</p:selectOneMenu>
+               					</f:facet>
            					</p:cellEditor>
 						</p:column>
-						<p:column headerText="Proportion">
+						
+						
+						<p:column headerText="Proportion" style="width:55px;">
 							<p:cellEditor>
                					<f:facet name="output"><h:outputText value="#{activity.proportion}" /></f:facet>
-               					<f:facet name="input"><p:inputText id="proportionInput" value="#{activity.proportion}" /></f:facet>
+               					<f:facet name="input">               						
+               						<p:selectOneMenu id="proportionInput" value="#{activity.proportion}"  required="true" style="width:80%;">
+					            		<f:selectItem itemLabel="1" itemValue="1" />
+					            		<f:selectItem itemLabel="0.75" itemValue="0.75" />
+					            		<f:selectItem itemLabel="0.5" itemValue="0.5" />
+					            		<f:selectItem itemLabel="0.25" itemValue="0.25" />							
+									</p:selectOneMenu>
+               					</f:facet>
            					</p:cellEditor>													
 						</p:column>
+						
+						
 						<p:column headerText="Project">
 							<p:cellEditor>
                					<f:facet name="output"><h:outputText value="#{activity.project}" /></f:facet>
-               					<f:facet name="input"><p:inputText id="projectInput" value="#{activity.project}" /></f:facet>
+               					<f:facet name="input">               						
+               						<p:selectOneMenu id="projectInput" value="#{activity.project}"  var="project" style="width:80%;">
+               							<f:selectItem itemLabel="-" itemValue="" />							
+										<f:selectItems value="#{mainBean.projectsL}" var="project" itemLabel="#{project}" itemValue="#{project}"/>
+									</p:selectOneMenu>
+               					</f:facet>
            					</p:cellEditor>									 						
-						</p:column>	 	
-						<p:column headerText="Task Group">							
+						</p:column>	
+						
+						 	
+						<p:column headerText="Task Group" >							
 							<p:cellEditor>
                					<f:facet name="output"><h:outputText value="#{activity.taskGroup}" /></f:facet>
-               					<f:facet name="input"><p:inputText id="taskGroupInput" value="#{activity.taskGroup}" /></f:facet>
+               					<f:facet name="input" >               						
+               						<p:selectOneMenu id="taskGroupInput" value="#{activity.taskGroup}"  var="taskGroup" style="width:80%;">
+               							<f:selectItem itemLabel="-" itemValue="" />							
+										<f:selectItems value="#{mainBean.taskGroupsL}" var="taskGroup" itemLabel="#{taskGroup}" itemValue="#{taskGroup}" />
+									</p:selectOneMenu>
+               					</f:facet>
            					</p:cellEditor>	 						
-						</p:column>	
+						</p:column>
+						
+							
 						<p:column headerText="Task">
 							<p:cellEditor>
                					<f:facet name="output"><h:outputText value="#{activity.task}" /></f:facet>
-               					<f:facet name="input"><p:inputText id="taskInput" value="#{activity.task}" /></f:facet>
+               					<f:facet name="input">               						
+               						<p:selectOneMenu id="taskInput" value="#{activity.task}"  var="task" style="width:80%;">
+               							<f:selectItem itemLabel="-" itemValue="" />							
+										<f:selectItems value="#{mainBean.tasksL}" var="task" itemLabel="#{task}" itemValue="#{task}"/>
+									</p:selectOneMenu>
+               					</f:facet>
            					</p:cellEditor>								 						
 						</p:column>	
-						<p:column headerText="Comment">
+						
+						
+						<p:column headerText="Comment" >
 							<p:cellEditor>
                					<f:facet name="output"><h:outputText value="#{activity.comment}" /></f:facet>
                					<f:facet name="input"><p:inputText id="commentInput" value="#{activity.comment}" /></f:facet>
            					</p:cellEditor>													
 						</p:column>	
-						<p:column headerText="%" style="width: 20px;">
+						
+						
+						<p:column headerText="%" style="width: 40px;">
 							<p:cellEditor>
                					<f:facet name="output"><h:outputText value="#{activity.percentage}" /></f:facet>
-               					<f:facet name="input"><p:inputText id="percentageInput" value="#{activity.percentage}" /></f:facet>
+               					<f:facet name="input">
+               						
+               						<p:selectOneMenu id="percentageInput" value="#{activity.percentage}"  required="true" style="width:80%;">
+					            		<f:selectItem itemLabel="100" itemValue="100" />
+					            		<f:selectItem itemLabel="90" itemValue="90" />
+					            		<f:selectItem itemLabel="80" itemValue="80" />
+					            		<f:selectItem itemLabel="70" itemValue="70" />
+					            		<f:selectItem itemLabel="60" itemValue="60" />
+					            		<f:selectItem itemLabel="50" itemValue="50" />
+					            		<f:selectItem itemLabel="40" itemValue="40" />
+					            		<f:selectItem itemLabel="30" itemValue="30" />
+					            		<f:selectItem itemLabel="20" itemValue="20" />
+					            		<f:selectItem itemLabel="10" itemValue="10" />					            									
+									</p:selectOneMenu>
+               					</f:facet>
            					</p:cellEditor>								 						
 						</p:column>	
+						
+						
 						<p:column headerText="Status">
-							<p:cellEditor>
-               					<f:facet name="output"><h:outputText value="#{activity.status}" /></f:facet>
-               					<f:facet name="input"><p:inputText id="statusInput" value="#{activity.status}" /></f:facet>
-           					</p:cellEditor>								 						
+							<h:outputText value="#{activity.status}" />			
 						</p:column>
+						
+						
 						<p:column style="width:32px">
-           					<p:rowEditor />
-       					</p:column>		
-						<!--  <p:column headerText="Approve btn">
-							<h:outputText value="Approve btn" />	 						
-						</p:column>  --> 
-						
-						
+           					<p:rowEditor rendered="#{activity.status != 'Approved'}"/>
+       					</p:column>	
+
 					</p:dataTable>
+					</h:form>
 				</td>				    				    
 			</tr>
 			<tr>

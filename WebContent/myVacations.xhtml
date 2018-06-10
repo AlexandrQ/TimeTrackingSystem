@@ -14,7 +14,7 @@
 	<h:head>
 		<title>My Vacations</title>
 		<script type="text/javascript" language="javascript">
-		
+				
 			function getRegPageData(){				
 				#{regBean.SelectCurrentUsers()};
 			}
@@ -27,23 +27,18 @@
 				#{projBean.SelectCurrentProjects()};
 			}
 			
-			function fillTD(){
-				//var cells = document.getElementsByClassName('status');
-				var cells = document.getElementsByTagName('td');
-				for (var i = 1; i &lt; cells.length; i++) {
-					//cells[i].classList.add('testFuncClass');
-					cells[i].className += " testtesttest";
-					//cells[i].classList.remove('status');
-					document.getElementById("targetLabel1").innerHTML += cells[i].classList.contains("status");
-					//document.getElementById("targetLabel2").innerHTML += cells[i].classList.contains("testFuncClass");
-					console.log(cells[i].classList);
-				  }	
+			function getACPageData(){				
+				#{confirmBean.selectUnconfirmedActivies()};
 			}
+			
+			
 		</script>
 		<style type="text/css">
-   			TABLE {
-    			table-layout: fixed;
-  			 }
+			
+			body {
+			    background-color: #EFFBFB;
+			}
+   			
   			 .testFuncClass {
   			 	background-color:#00f7f3;
   			 }
@@ -65,6 +60,9 @@
   			 }
   			 .ui-datepicker-table{
   			 	height: 100%;
+  			 }
+  			 .weekendClass{
+  			 	background-color:#CFCECE;
   			 }
   			 
   			 
@@ -100,12 +98,15 @@
 						</p:menuitem>
 						<p:menuitem value="Add project" url="projects.xhtml" onclick="getProjPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 							<f:param name="i" value="3" />
+						</p:menuitem>
+						<p:menuitem value="Unconfirmed activity" url="activityConfirmation.xhtml" onclick="getACPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+							<f:param name="i" value="4" />
 						</p:menuitem>			
 					</p:tabMenu>
 				</td>					    
 			</tr>
 			<tr>
-				<td colspan="2" style="border-style: solid; border-width: 1px;">	
+				<td colspan="2" style="border-style: solid; border-width: 1px; width:80%;">	
 					<h:form>
 						<p:toolbar>
 					        <f:facet name="left">
@@ -130,9 +131,9 @@
 						</p:toolbar>
 					</h:form>
 				</td>
-				<td valign="top" rowspan="3" style="border-style: solid; border-width: 1px;">
+				<td valign="top" rowspan="3" style="border-style: solid; border-width: 1px; ">
 					<h:form>
-			   			<p:calendar id="eventCalendar" value="#{calendarBean.date1}" mode="inline"  style="font-size: 14px;">
+			   			<p:calendar id="eventCalendar" value="#{calendarBean.date1}" mode="inline"  style="font-size: 14px;" >
 			   				<p:ajax event="dateSelect" update="" />
 			   			</p:calendar>
    					</h:form>	
@@ -140,7 +141,7 @@
 			</tr>
 			<tr>
 				<td style="border-style: solid; border-width: 1px;">	
-					<p:tabView>
+					<p:tabView style="background-color: #EFFBFB; border-style: none;">
 				        <p:tab title="Future vacations">
 				            <h:panelGrid columns="2" cellpadding="10">				                
 				                <h:outputText
@@ -153,7 +154,7 @@
 				    </p:tabView>
 				</td>
 				<td style="border-style: solid; border-width: 1px;">
-					<p:tabView>
+					<p:tabView style="background-color: #EFFBFB; border-style: none;">
 				        <p:tab title="Past vacations">
 				            <h:panelGrid columns="2" cellpadding="10">				                
 				                <h:outputText
@@ -167,36 +168,36 @@
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2" style="border-style: solid; border-width: 1px;">					
-					<p:tabView>					
+				<td colspan="2" style="border-style: solid; border-width: 1px;" >					
+					<p:tabView style="width:1300px !important; background-color: #EFFBFB; border-style: none;" >					
 				        <p:tab title="Calendar">
-				            <div style="overflow-x:auto; width: 100%;">
-								<table border="1" style="width: 100%;">
+				            <div style="overflow-x:auto; width: 100%; ">
+								<table border="1" style="text-align: center; border-style: none; border-collapse: collapse" bordercolor="#DCDCDC">
 									<tr>
 			            				<ui:repeat value="#{vacationBean.monthLengthList}" var="data4" >			            					
-					                		<td colspan="#{data4.length}" style="width: 700px; height: 20px; font-size: 10px;">
-					                    		#{data4.month} 
+					                		<td colspan="#{data4.length}" style="width: 750px; height: 20px; font-size: 10px; background-color: #2E9AFE; color: white;">
+					                    		 #{data4.month}
 					                		</td>			                				                		
 			            				</ui:repeat>
 			            			</tr>
 			            			<tr>
 			            				<ui:repeat value="#{vacationBean.numbersOfDaysOfWeekYear}" var="data3" >			            					
-					                		<td  style="width: 20px; height: 20px; font-size: 10px;">
-					                    		#{data3}
+					                		<td class="#{data3.daysClass}"  style="width: 25px; height: 20px; font-size: 10px; ">
+					                    		<div style="width: 25px;">#{data3.numberOfDays}</div>
 					                		</td>			                				                		
 			            				</ui:repeat>
 			            			</tr>
 			            			<tr>
 			            				<ui:repeat value="#{vacationBean.daysOfWeekInYear}" var="data2" >			            					
-					                		<td  style="width: 20px; height: 20px; font-size: 10px;">
-					                    		#{data2}
+					                		<td class="#{data2.daysClass}"  style="width: 25px; height: 20px; font-size: 10px; ">
+					                    		<div style="width: 25px;">#{data2.nameOfDays}</div>
 					                		</td>			                				                		
 			            				</ui:repeat>
 			            			</tr>
 			            			<tr>
 			            				<ui:repeat value="#{vacationBean.classesListYear}" var="data" >			            					
-					                		<td class="#{data}"  style="width: 20px; height: 20px; font-size: 0.01px;">
-					                    		
+					                		<td class="#{data}"  style="width: 25px; height: 20px; font-size: 0.01px;">
+					                    		<div style="width: 25px;"></div>
 					                		</td>			                				                		
 			            				</ui:repeat>
 			            			</tr>			            			

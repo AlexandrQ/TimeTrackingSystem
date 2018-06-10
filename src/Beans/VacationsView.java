@@ -19,7 +19,9 @@ import javax.faces.bean.ViewScoped;
 
 import dbCon.SingletonDBConnection;
 import entity.Activity;
+import entity.DaysWeekCls;
 import entity.MonthLength;
+import entity.NDaysCls;
 
 @ManagedBean(name = "vacationBean")
 @SessionScoped
@@ -31,15 +33,50 @@ public class VacationsView implements Serializable{
 	@ManagedProperty(value="#{mainBean}")
 	private MainBean mb;
 	
-	private ArrayList<Activity> activitiesListYear = new ArrayList<>();
-	//private ArrayList<StatusesAndClases> activitiesListYearAndClasses = new ArrayList<>();
+	private ArrayList<Activity> activitiesListYear = new ArrayList<>();	
 	private ArrayList<String> classesListYear = new ArrayList<>();
+	private ArrayList<String> weekends = new ArrayList<>();
 	
-	private ArrayList<String> daysOfWeekInYear = new ArrayList<>();
-	private ArrayList<Integer> numbersOfDaysOfWeekYear = new ArrayList<>();
+	private ArrayList<DaysWeekCls> daysOfWeekInYear = new ArrayList<>();
+	private ArrayList<NDaysCls> numbersOfDaysOfWeekYear = new ArrayList<>();
 	private ArrayList<MonthLength> monthLengthList = new ArrayList<>(); 
 	
 	
+	
+	
+	
+
+	public ArrayList<DaysWeekCls> getDaysOfWeekInYear() {
+		return daysOfWeekInYear;
+	}
+
+	public void setDaysOfWeekInYear(ArrayList<DaysWeekCls> daysOfWeekInYear) {
+		this.daysOfWeekInYear = daysOfWeekInYear;
+	}
+
+	public ArrayList<String> getWeekends() {
+		return weekends;
+	}
+
+	public void setWeekends(ArrayList<String> weekends) {
+		this.weekends = weekends;
+	}
+
+	public ArrayList<NDaysCls> getNumbersOfDaysOfWeekYear() {
+		return numbersOfDaysOfWeekYear;
+	}
+
+	public void setNumbersOfDaysOfWeekYear(ArrayList<NDaysCls> numbersOfDaysOfWeekYear) {
+		this.numbersOfDaysOfWeekYear = numbersOfDaysOfWeekYear;
+	}
+
+	public ArrayList<String> getWeekens() {
+		return weekends;
+	}
+
+	public void setWeekens(ArrayList<String> weekens) {
+		this.weekends = weekens;
+	}
 
 	public ArrayList<String> getClassesListYear() {
 		return classesListYear;
@@ -55,22 +92,6 @@ public class VacationsView implements Serializable{
 
 	public void setMonthLengthList(ArrayList<MonthLength> monthLengthList) {
 		this.monthLengthList = monthLengthList;
-	}
-
-	public ArrayList<String> getDaysOfWeekInYear() {
-		return daysOfWeekInYear;
-	}
-
-	public void setDaysOfWeekInYear(ArrayList<String> daysOfWeekInYear) {
-		this.daysOfWeekInYear = daysOfWeekInYear;
-	}
-
-	public ArrayList<Integer> getNumbersOfDaysOfWeekYear() {
-		return numbersOfDaysOfWeekYear;
-	}
-
-	public void setNumbersOfDaysOfWeekYear(ArrayList<Integer> numbersOfDaysOfWeekYear) {
-		this.numbersOfDaysOfWeekYear = numbersOfDaysOfWeekYear;
 	}
 
 	public ArrayList<Activity> getActivitiesListYear() {
@@ -92,12 +113,8 @@ public class VacationsView implements Serializable{
 	public void getCurrentAtivities() {		
 		
 		LocalDate date = LocalDate.now();
-		activitiesListYear.clear();		
+		activitiesListYear.clear();	
 		
-		/*LocalDate d = LocalDate.now();
-		int year = d.getYear();
-		LocalDate startOfYear = LocalDate.of(year, 1, 1);
-		LocalDate endOfYear = LocalDate.of(year, 12, 31);*/
 		String str = date.getDayOfWeek().toString();
 		ArrayList<LocalDate> daysInSelectedYear = fillDaysInSelectedYear(date);			
 		
@@ -169,7 +186,8 @@ public class VacationsView implements Serializable{
 	    
 	    fillActivitiesListForEmptyDays(daysInSelectedYear);		
 	    fillNumberOfDaysAndDaysOfWeek();
-	    fillStatusesAndClases();
+	    fillClasesList();
+	    fillWeekendsList();
 	    //fillDaysForCalendarHighlighter();
 	}
 	
@@ -255,16 +273,33 @@ public class VacationsView implements Serializable{
 	}
 	
 	private void fillNumberOfDaysAndDaysOfWeek() {
-		//activitiesListYear 
-		//daysOfWeekInYear 
-		//numbersOfDaysOfWeekYear
+		
 		daysOfWeekInYear.clear();
 		numbersOfDaysOfWeekYear.clear();
-		boolean sw = true;
+		boolean sw = true, weekendB = true;
 		for (Activity obj:activitiesListYear) {
 			sw = true;
-			daysOfWeekInYear.add(LocalDate.parse(obj.getDate()).getDayOfWeek().toString().substring(0, 2) );
-			numbersOfDaysOfWeekYear.add(LocalDate.parse(obj.getDate()).getDayOfMonth());
+			weekendB = true;
+			
+			//daysOfWeekInYear.add(LocalDate.parse(obj.getDate()).getDayOfWeek().toString().substring(0, 2) );
+			
+			/////////////////////////////////
+			
+			for(String weekend : weekends) {
+				if(obj.getDate().equals(weekend) ) {
+					numbersOfDaysOfWeekYear.add(new NDaysCls( LocalDate.parse(obj.getDate()).getDayOfMonth()+"" , "weekendClass" ));
+					daysOfWeekInYear.add(new DaysWeekCls( LocalDate.parse(obj.getDate()).getDayOfWeek().toString().substring(0, 2) , "weekendClass" ));
+					
+					weekendB = false;
+					break;
+				}
+			}
+			if (weekendB) {
+				numbersOfDaysOfWeekYear.add(new NDaysCls( LocalDate.parse(obj.getDate()).getDayOfMonth()+"" , "notWeekendClass" ));
+				daysOfWeekInYear.add(new DaysWeekCls( LocalDate.parse(obj.getDate()).getDayOfWeek().toString().substring(0, 2) , "notWeekendClass" ));
+			}
+			
+			////////////////////////////////
 			
 			for (MonthLength m : monthLengthList) {
 				if (m.getMonth().equals(LocalDate.parse(obj.getDate()).getMonth().toString())) {
@@ -275,12 +310,11 @@ public class VacationsView implements Serializable{
 		}
 	}
 	
-	private void fillStatusesAndClases() {
-		//activitiesListYear
-		//classesListYear
+	private void fillClasesList() {		
+		classesListYear.clear();
 		
-		for (Activity obj : activitiesListYear) {
-			if (obj.getType().equals("Work day")) {
+		for (Activity obj : activitiesListYear) {			
+			if (obj.getType().equals("Work day")) {				
 				classesListYear.add("wd_class");
 			}
 			else if (obj.getType().equals("Vacation")) {
@@ -290,11 +324,50 @@ public class VacationsView implements Serializable{
 				classesListYear.add("sck_class");
 			}
 			else if (obj.getType().equals("Not filled")) {
-				classesListYear.add("nf_class");
+				boolean b = true;
+				for(String weekend : weekends) {
+					if(obj.getDate().equals(weekend) ) {
+						classesListYear.add("weekendClass");
+						b = false;
+						break;
+					}
+				}
+				if (b) {
+					classesListYear.add("nf_class");
+				}	
 			}
 			else {
 				classesListYear.add("nf_class");
 			}
+		}
+	}
+	
+	private void fillWeekendsList() {
+		String queryStrWeekens = "SELECT weekend_date FROM public.weekends";
+		
+		Connection dbConnection = null;
+	    Statement statement = null;
+	    ResultSet rsWeekend;
+	    
+	    try {
+		    dbConnection = SingletonDBConnection.getInstance().getConnInst();
+		    statement = dbConnection.createStatement();	 
+		    
+		    rsWeekend = statement.executeQuery(queryStrWeekens);
+		    
+		    while (rsWeekend.next()) {
+		    	weekends.add(rsWeekend.getString("weekend_date"));		    	
+		    }
+	    } catch (SQLException e) {
+		    System.out.println(e.getMessage());	 
+		} finally {
+			if (dbConnection != null) {
+	            try {
+					dbConnection.close();
+				} catch (SQLException e) {				
+					e.printStackTrace();
+				}
+	        }				
 		}
 	}
 	

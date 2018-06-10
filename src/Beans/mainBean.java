@@ -15,6 +15,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.faces.application.FacesMessage;
@@ -22,7 +23,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
-import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 
@@ -38,6 +38,8 @@ public class MainBean implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	
+	private Activity testActivity = new Activity();
+	
 	private User user = new User();
 	private ArrayList<Activity> activitiesList;
 	private ArrayList<Activity> activitiesListWeek = new ArrayList<>();	
@@ -48,10 +50,66 @@ public class MainBean implements Serializable{
 	private ArrayList<String> vacationDaysForCalendar = new ArrayList<>();	
 	private ArrayList<String> sickDaysForCalendar = new ArrayList<>();
 	private ArrayList<String> daysOffForCalendar = new ArrayList<>();
+	private ArrayList<String> weekends = new ArrayList<>();
+	
+	private List<String> typesL = new ArrayList<String>();
+	private List<String> projectsL = new ArrayList<String>();
+	private List<String> taskGroupsL = new ArrayList<String>();
+	private List<String> tasksL = new ArrayList<String>();
 	
 	
 	
 	
+	
+	
+	public ArrayList<String> getWeekends() {
+		return weekends;
+	}
+
+	public void setWeekends(ArrayList<String> weekends) {
+		this.weekends = weekends;
+	}
+
+	public List<String> getTypesL() {
+		return typesL;
+	}
+
+	public void setTypesL(List<String> typesL) {
+		this.typesL = typesL;
+	}
+
+	public List<String> getProjectsL() {
+		return projectsL;
+	}
+
+	public void setProjectsL(List<String> projectsL) {
+		this.projectsL = projectsL;
+	}
+
+	public List<String> getTaskGroupsL() {
+		return taskGroupsL;
+	}
+
+	public void setTaskGroupsL(List<String> taskGroupsL) {
+		this.taskGroupsL = taskGroupsL;
+	}
+
+	public List<String> getTasksL() {
+		return tasksL;
+	}
+
+	public void setTasksL(List<String> tasksL) {
+		this.tasksL = tasksL;
+	}
+
+	public Activity getTestActivity() {
+		return testActivity;
+	}
+
+	public void setTestActivity(Activity testActivity) {
+		this.testActivity = testActivity;
+	}
+
 	public ArrayList<String> getVacationDaysForCalendar() {
 		return vacationDaysForCalendar;
 	}
@@ -131,7 +189,8 @@ public class MainBean implements Serializable{
 	public String loggedIn() {				
 		if(UserAutenticate()) {			
 			user.setLogged(true);
-			getCurrentAtivities(LocalDate.now());				
+			getCurrentAtivities(LocalDate.now());
+			fillWeekendsList();
 			return "myActivity.xhtml?faces-redirect=true";			
 		}
 		else {
@@ -170,16 +229,15 @@ public class MainBean implements Serializable{
 			    dbConnection = SingletonDBConnection.getInstance().getConnInst();		    	
 			    statement = dbConnection.createStatement();		 
 			    
-			    rsCount = statement.executeQuery(querryStrCount);		    
-			    
-			    if (rsCount.next()) {		    	
-			    	if(rsCount.getString("Count").equals("1") ) {
+			    rsCount = statement.executeQuery(querryStrCount);			    
+			    if (rsCount.next()) {			    	
+			    	if(rsCount.getString("Count").equals("1") ) {			    		
 			    		rsUser = statement.executeQuery(querryStrUser);
 			    		while (rsUser.next()) {	
 					    		user.setName(rsUser.getString("user_name"));	 
 					    		user.setSurname(rsUser.getString("user_surname"));	
 					    		user.setProject(rsUser.getString("project_name"));	
-					    		user.setRole(rsUser.getString("user_role_name"));
+					    		user.setRole(rsUser.getString("user_role_name"));					    		
 					    }
 				    	return true;
 				    }
@@ -328,6 +386,7 @@ public class MainBean implements Serializable{
 	    else if((lengthOfCurrentActivitiesList.equals("month"))) {activitiesList = activitiesListMonth;}
 	    
 	    fillDaysForCalendarHighlighter();
+	    fillListsForSelectMenus();
 	}
 	
 	
@@ -598,31 +657,186 @@ public class MainBean implements Serializable{
     }*/
 	
 	public void onRowEdit(RowEditEvent event) {
-		//System.out.println("My comment: onRowEdit->Activity: " + str);
-		//FacesMessage msg = new FacesMessage("Edit EditString", str);
-       // FacesContext.getCurrentInstance().addMessage(null, msg);
-		// code to save changes
-		FacesMessage msg = new FacesMessage("Edit Cancelled", ((Activity) event.getObject()).getComment());
+	
+		FacesMessage msg = null;
+		Activity obj = (Activity) event.getObject();
+		String queryStr = "";
+		if(!obj.getProject().isEmpty() && !obj.getTaskGroup().isEmpty() && !obj.getTask().isEmpty()) {
+			if (obj.getStatus().equals("Not filled")) {				
+				queryStr = "INSERT INTO public.activities(" + 
+						"	activity_user, activity_date, activity_project, activity_percentage, activity_type, activity_task_group, activity_task, activity_comment, activity_proportion, activity_status)" + 
+						"	VALUES ((SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' ), " + 
+						"            '" + obj.getDate() + "', " + 
+						"            (SELECT project_id FROM public.projects WHERE project_name = '" + obj.getProject() + "' ), " + 
+						"            '" + obj.getPercentage() + "', " +
+						"            (SELECT activity_type_id FROM public.activity_types WHERE activity_type_name = '" + obj.getType() + "' ), " + 
+						"            (SELECT activity_task_group_id FROM public.activity_task_groups WHERE activity_task_group_name = '" + obj.getTaskGroup() + "' ), " + 
+						"            (SELECT activity_task_id FROM public.activity_tasks WHERE activity_task_name = '" + obj.getTask() + "' ), " + 
+						"            '" + obj.getComment() + "', " + 
+						"            '" + obj.getProportion() + "', " +
+						"            3);";
+			} 
+			else {			
+				queryStr = "UPDATE public.activities" + 
+						"	SET activity_percentage=" + obj.getPercentage() +" ," + 
+						"        activity_type=(SELECT activity_type_id FROM public.activity_types WHERE activity_type_name = '" + obj.getType() + "' )," +
+						"        activity_task_group=(SELECT activity_task_group_id FROM public.activity_task_groups WHERE activity_task_group_name = '" + obj.getTaskGroup() + "' )," +
+						"        activity_task=(SELECT activity_task_id FROM public.activity_tasks WHERE activity_task_name = '" + obj.getTask() + "' )," +
+						"        activity_project=(SELECT project_id FROM public.projects WHERE project_name = '" + obj.getProject() + "' )," + 
+						"        activity_comment = '" + obj.getComment() + "', " + 
+						"        activity_proportion = " + obj.getProportion() + ", " + 
+						"        activity_status = 3" + 
+						"	WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() +"' )" + 
+						"    AND activity_date = '" + obj.getDate() +"'";
+			}
+		} else if(obj.getType().equals("Sick day") || obj.getType().equals("Day off")) {
+			if (obj.getStatus().equals("Not filled")) {				
+				queryStr = "INSERT INTO public.activities(" + 
+						"	activity_user, activity_date, activity_percentage, activity_type, activity_comment, activity_proportion, activity_status)" + 
+						"	VALUES ((SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() + "' ), " + 
+						"            '" + obj.getDate() + "', " +						
+						"            '" + obj.getPercentage() + "', " +
+						"            (SELECT activity_type_id FROM public.activity_types WHERE activity_type_name = '" + obj.getType() + "' ), " + 						
+						"            '" + obj.getComment() + "', " + 
+						"            '" + obj.getProportion() + "', " +
+						"            3);";
+			} 
+			else {			
+				queryStr = "UPDATE public.activities" + 
+						"	SET activity_percentage=" + obj.getPercentage() +" ," + 
+						"        activity_type=(SELECT activity_type_id FROM public.activity_types WHERE activity_type_name = '" + obj.getType() + "' )," +
+						"        activity_task_group=null ," +
+						"        activity_task=null ," +
+						"        activity_project=null ," + 
+						"        activity_comment = '" + obj.getComment() + "', " + 
+						"        activity_proportion = " + obj.getProportion() + ", " + 
+						"        activity_status = 3" + 
+						"	WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() +"' )" + 
+						"    AND activity_date = '" + obj.getDate() +"'";
+			}
+		} else {
+			msg = new FacesMessage("Error", "Fields can not be empty");
+			return;
+		}
+		
+		Connection dbConnection = null;
+		Statement statement = null;
+		    
+	    try {
+		    dbConnection = SingletonDBConnection.getInstance().getConnInst();
+		    statement = dbConnection.createStatement();		
+		    
+		    if (!(statement.executeUpdate(queryStr) == 1)) {			    	
+		    	msg = new FacesMessage("Error", "Update was unsuccessful");
+		    } else msg = new FacesMessage("OK", "Successful!");
+		    
+		    if (dbConnection != null) {
+		    	dbConnection.close();	
+		    }				
+		    
+		} catch (SQLException e) {
+		    System.out.println(e.getMessage());	
+		    msg = new FacesMessage("Error", "Update was unsuccessful");
+		    if (dbConnection != null) {
+	            try {
+					dbConnection.close();
+				} catch (SQLException ee) {				
+					ee.printStackTrace();
+				}		            
+	        }	
+		}
+	    getCurrentAtivities(LocalDate.now());
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
+	
      
     public void onRowCancel(RowEditEvent event) {
-        FacesMessage msg = new FacesMessage("Edit Cancelled", ((Activity) event.getObject()).getDate());
+        FacesMessage msg = new FacesMessage("Edit Cancelled", "");
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }	
     
-    public void onCellEdit(CellEditEvent event) {
-    	System.out.println("My comment: onCellEdit");
-        Object oldValue = event.getOldValue();
-        Object newValue = event.getNewValue();
-        
-         
-        System.out.println("My comment: onCellEdit : Cell Changed Old: " + oldValue + ", New:" + newValue);
-        if(newValue != null && !newValue.equals(oldValue)) {
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell Changed", "Old: " + oldValue + ", New:" + newValue);
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-            
-        }
-    }
+    
+    private void fillListsForSelectMenus() {
+				
+    	typesL.clear();
+    	taskGroupsL.clear();
+    	tasksL.clear();
+    	projectsL.clear();
+    	
+		String queryStrTypes = "SELECT activity_type_name FROM public.activity_types";
+		String queryStrProjects = "SELECT project_name FROM public.projects";
+		String queryStrTaskGroups = "SELECT activity_task_group_name FROM public.activity_task_groups";
+		String queryStrTasks = "SELECT activity_task_name FROM public.activity_tasks";
+				
+		Connection dbConnection = null;
+		Statement statement = null;
+		ResultSet rsTypes, rsTaskGroups, rsTasks, rsProj;
+		
+		try {				
+		    dbConnection = SingletonDBConnection.getInstance().getConnInst();		    	
+		    statement = dbConnection.createStatement();
+		    
+		    rsTypes = statement.executeQuery(queryStrTypes);    		
+    		while (rsTypes.next()) {	
+    			typesL.add(rsTypes.getString("activity_type_name"));
+		    }
+    		
+    		rsTaskGroups = statement.executeQuery(queryStrTaskGroups);    		
+    		while (rsTaskGroups.next()) {	
+    			taskGroupsL.add(rsTaskGroups.getString("activity_task_group_name"));
+		    }
+    		
+    		rsTasks = statement.executeQuery(queryStrTasks);    		
+    		while (rsTasks.next()) {	
+    			tasksL.add(rsTasks.getString("activity_task_name"));
+		    }
+    		
+    		rsProj = statement.executeQuery(queryStrProjects);    		
+    		while (rsProj.next()) {	
+    			projectsL.add(rsProj.getString("project_name"));
+		    }
+    		
+		} catch (SQLException e) {
+		    System.out.println(e.getMessage());		    
+		} finally {
+			if (dbConnection != null) {
+	            try {
+					dbConnection.close();
+				} catch (SQLException e) {				
+					e.printStackTrace();
+				}
+	        }			
+		}		
+	}
+    
+    
+    private void fillWeekendsList() {
+		String queryStrWeekens = "SELECT weekend_date FROM public.weekends";
+		
+		Connection dbConnection = null;
+	    Statement statement = null;
+	    ResultSet rsWeekend;
+	    
+	    try {
+		    dbConnection = SingletonDBConnection.getInstance().getConnInst();
+		    statement = dbConnection.createStatement();	 
+		    
+		    rsWeekend = statement.executeQuery(queryStrWeekens);
+		    
+		    while (rsWeekend.next()) {
+		    	weekends.add(rsWeekend.getString("weekend_date"));		    	
+		    }
+	    } catch (SQLException e) {
+		    System.out.println(e.getMessage());	 
+		} finally {
+			if (dbConnection != null) {
+	            try {
+					dbConnection.close();
+				} catch (SQLException e) {				
+					e.printStackTrace();
+				}
+	        }				
+		}
+	}
 
 }

@@ -153,9 +153,10 @@ public class RegisterBean {
 		
 	    
 	    
-		if (regUser.getLogin() != null && regUser.getName() != null && regUser.getSurname() != null &&  regUser.getPassword() != null && regUser.getProject() != null && regUser.getPosition() != null && regUser.getRole() != null && regUser.getStatus() != null && regUser.getDegree() != null) {
-			String querryStr = "INSERT INTO public.users(user_login, user_password, user_name, user_surname, user_project, user_position, user_degree, user_role, user_status, user_register_date)" + 
+		if (regUser.getLogin() != null && regUser.getName() != null && regUser.getSurname() != null &&  regUser.getPassword() != null && regUser.getProject() != null && regUser.getPosition() != null && regUser.getRole() != null && regUser.getStatus() != null && regUser.getDegree() != null && regUser.getGender() != null) {
+			String querryStr = "INSERT INTO public.users(user_login, user_password, user_name, user_surname, user_gender, user_project, user_position, user_degree, user_role, user_status, user_register_date)" + 
 					"	VALUES ('" + regUser.getLogin() + "', '" + regUser.getPassword() +"', '" + regUser.getName() + "', '" + regUser.getSurname() + "', " + 
+					"            (SELECT user_gender_id FROM public.user_genders WHERE user_gender_name = '" + regUser.getGender() + "'), " + 
 					"            (SELECT project_id FROM public.projects WHERE project_name = '" + regUser.getProject() + "'), " + 
 					"            (SELECT user_position_id FROM public.user_positions WHERE user_position_name = '" + regUser.getPosition() + "'), " + 
 					"            (SELECT user_degree_id FROM public.user_degrees WHERE user_degree_name = '" + regUser.getDegree() + "'), " + 
@@ -233,13 +234,14 @@ public class RegisterBean {
 		currentUsers.clear();
 		
 		User tempUser;
-		String querryStrUser = "SELECT user_login, user_name, user_surname, project_name, user_position_name, user_role_name, user_register_date, user_degree_name, user_status_name" + 
-				"	FROM public.users, public.projects, public.user_positions, public.user_roles, public.user_degrees, public.user_statuses" + 
+		String querryStrUser = "SELECT user_login, user_name, user_surname, user_gender_name, project_name, user_position_name, user_role_name, user_register_date, user_degree_name, user_status_name" + 
+				"	FROM public.users, public.projects, public.user_positions, public.user_roles, public.user_degrees, public.user_statuses, public.user_genders" + 
 				"    WHERE user_project = project_id" + 
 				"    AND user_position = user_position_id" + 
 				"    AND user_role = user_role_id" +
 				"    AND user_degree = user_degree_id" +
-				"    AND user_status = user_status_id";
+				"    AND user_status = user_status_id" +
+				"    AND user_gender = user_gender_id";
 		Connection dbConnection = null;
 	    Statement statement = null;
 	    ResultSet rsUser;
@@ -261,6 +263,7 @@ public class RegisterBean {
 		    		tempUser.setRegDate(rsUser.getString("user_register_date"));
 		    		tempUser.setStatus(rsUser.getString("user_status_name"));
 		    		tempUser.setDegree(rsUser.getString("user_degree_name"));
+		    		tempUser.setGender(rsUser.getString("user_gender_name"));
 		    		
 		    		currentUsers.add(tempUser);
 		    }

@@ -1,12 +1,16 @@
 package entity;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
 //@ManagedBean(name = "activity")
 //@SessionScoped
 
 public class Activity implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String user;
 	private String date;
 	private String type;
 	private String proportion;
@@ -42,6 +46,21 @@ public class Activity implements Serializable{
 		this.status = status;
 	}
 	
+	public Activity(String user, String date, String type, String proportion, String project, String taskGroup, String task,
+			String comment, String percentage,  String status) {
+		super();
+		this.user = user;
+		this.date = date;
+		this.project = project;
+		this.proportion = proportion;		
+		this.type = type;
+		this.taskGroup = taskGroup;
+		this.task = task;
+		this.comment = comment;
+		this.percentage = percentage;
+		this.status = status;
+	}
+	
 	public Activity(String date, String type, String proportion, String comment, String percentage,  String status) {
 		super();
 		this.date = date;
@@ -52,7 +71,15 @@ public class Activity implements Serializable{
 		this.status = status;
 	}
 
+	
 
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
 
 	public String getDate() {
 		return date;
