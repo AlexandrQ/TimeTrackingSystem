@@ -8,7 +8,9 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -44,12 +46,23 @@ public class VacationsView implements Serializable{
 	private ArrayList<MonthLength> monthLengthList = new ArrayList<>(); 
 	
 	private ArrayList<Vacation> currentVacations  = new ArrayList<>();
+	private ArrayList<Vacation> previousVacations  = new ArrayList<>();
 	private ArrayList<String> typesL  = new ArrayList<>();
 	
+
 	
 	
 	
 	
+	
+
+	public ArrayList<Vacation> getPreviousVacations() {
+		return previousVacations;
+	}
+
+	public void setPreviousVacations(ArrayList<Vacation> previosVacations) {
+		this.previousVacations = previosVacations;
+	}
 
 	public ArrayList<String> getTypesL() {
 		return typesL;
@@ -215,6 +228,7 @@ public class VacationsView implements Serializable{
 	    fillWeekendsList();
 	    fillTypesList();
 	    fillCurrentVacations();
+	    fillPreviosVacations();
 	    //fillDaysForCalendarHighlighter();
 	}
 	
@@ -437,7 +451,8 @@ public class VacationsView implements Serializable{
 				"    WHERE vacation_user = user_id" + 
 				"    AND vacation_user = (SELECT user_id FROM public.users WHERE user_login = '" + mb.getUser().getLogin() + "')" + 
 				"    AND vacation_type = activity_type_id" + 
-				"    AND vacation_status = activity_status_id";
+				"    AND vacation_status = activity_status_id" +
+				"    AND vacation_end_date >= '" + LocalDate.now() + "'";
 		
 		Connection dbConnection = null;
 	    Statement statement = null;
@@ -460,6 +475,52 @@ public class VacationsView implements Serializable{
 		    	vac.setUser(rsVac.getString("user_login"));		    	
 		    	
 		    	currentVacations.add(vac);		    	
+		    }
+	    } catch (SQLException e) {
+		    System.out.println(e.getMessage());	 
+		} finally {
+			if (dbConnection != null) {
+	            try {
+					dbConnection.close();
+				} catch (SQLException e) {				
+					e.printStackTrace();
+				}
+	        }				
+		}		
+	}
+	
+	private void fillPreviosVacations() {
+		previousVacations.clear();
+		
+		String queryStrVac = "SELECT vacation_start_date, vacation_end_date, vacation_quantity, user_login, activity_type_name, activity_status_name" + 
+				"	FROM public.vacations, public.users, public.activity_types, public.activity_statuses" + 
+				"    WHERE vacation_user = user_id" + 
+				"    AND vacation_user = (SELECT user_id FROM public.users WHERE user_login = '" + mb.getUser().getLogin() + "')" + 
+				"    AND vacation_type = activity_type_id" + 
+				"    AND vacation_status = activity_status_id" +
+				"    AND vacation_end_date < '" + LocalDate.now() + "'";
+		
+		Connection dbConnection = null;
+	    Statement statement = null;
+	    ResultSet rsVac;
+	    
+	    try {
+		    dbConnection = SingletonDBConnection.getInstance().getConnInst();
+		    statement = dbConnection.createStatement();	 
+		    
+		    rsVac = statement.executeQuery(queryStrVac);
+		    
+		    while (rsVac.next()) {
+		    	Vacation vac = new Vacation();		    	 
+		    	
+		    	vac.setStartDate(LocalDate.parse(rsVac.getString("vacation_start_date")));
+		    	vac.setEndDate(LocalDate.parse(rsVac.getString("vacation_end_date")));
+		    	vac.setQuantity(Integer.valueOf(rsVac.getString("vacation_quantity")));
+		    	vac.setStatus(rsVac.getString("activity_status_name"));
+		    	vac.setType(rsVac.getString("activity_type_name"));
+		    	vac.setUser(rsVac.getString("user_login"));		    	
+		    	
+		    	previousVacations.add(vac);		    	
 		    }
 	    } catch (SQLException e) {
 		    System.out.println(e.getMessage());	 

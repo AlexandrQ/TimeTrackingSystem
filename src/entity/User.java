@@ -15,6 +15,7 @@ public class User implements Serializable{
 	private String role;
 	private String project;
 	private String regDate;
+	private String dismissalDate;
 	private String position;
 	private String degree;
 	private String status;
@@ -23,6 +24,25 @@ public class User implements Serializable{
 	
 	
 	
+	
+	public String getDismissalDate() {
+		return dismissalDate;
+	}
+
+
+
+	public void setDismissalDate(String dismissalDate) {
+		this.dismissalDate = dismissalDate;
+	}
+
+
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+
+
 	public String getGender() {
 		return gender;
 	}

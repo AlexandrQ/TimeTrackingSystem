@@ -91,9 +91,9 @@
 	        </h:panelGrid>
         </div>
 		 
-		<table style="width: 100%; border-style: solid; border-width: 1px; font-size: 10px;">
+		<table style="width: 100%; border-style: none; font-size: 10px;">
 			<tr >
-				<td colspan="3" style="border-style: solid; border-width: 1px;">
+				<td colspan="3" style="border-style: none;">
 					<p:tabMenu activeIndex="1">
 						<p:menuitem value="My Activity" url="myActivity.xhtml">
 							<f:param name="i" value="0" />
@@ -117,7 +117,7 @@
 				</td>					    
 			</tr>
 			<tr>
-				<td colspan="2" style="border-style: solid; border-width: 1px; width:80%;">	
+				<td colspan="2" style="border-style: none; width:80%;">	
 					<h:form>
 						<p:toolbar>
 					        <f:facet name="left">
@@ -142,16 +142,16 @@
 						</p:toolbar>
 					</h:form>
 				</td>
-				<td valign="top" rowspan="3" style="border-style: solid; border-width: 1px; ">
+				<td valign="top" rowspan="4" style="border-style: none; ">
 					<h:form>
 			   			<p:calendar id="eventCalendar" value="#{calendarBean.date1}" mode="inline"  style="font-size: 14px;" >
 			   				<p:ajax event="dateSelect" update="" />
-			   			</p:calendar>
+			   			</p:calendar>			   			
    					</h:form>	
 				</td>
 			</tr>
 			<tr>
-				<td valign="top" style="border-style: solid; border-width: 1px; width:35%">	
+				<td valign="top" style="border-style: none; width:35%">	
 					<p:tabView style="background-color: #EFFBFB; border-style: none;">
 				        <p:tab title="Future vacations">
 				            <h:panelGrid columns="2" cellpadding="10" >				                
@@ -208,22 +208,40 @@
 				        </p:tab>				        
 				    </p:tabView>
 				</td>
-				<td valign="top" style="border-style: solid; border-width: 1px;">
+				<td valign="top" style="border-style: none; width:35%">	
 					<p:tabView style="background-color: #EFFBFB; border-style: none;">
-				        <p:tab title="Past vacations">
-				            <h:panelGrid columns="2" cellpadding="10">				                
-				                <h:outputText
-				                    value="The story begins as Don Vito Corleone, the head of a New York Mafia family, oversees his daughter's wedding. 
-				                    His beloved son Michael has just come home from the war, but does not intend to become part of his father's business.
-				                    Through Michael's life the nature of the family business becomes clear. The business of the family is just like the head of the family, kind and benevolent to those who give respect, 
-				                    but given to ruthless violence whenever anything stands against the good of the family." />
+				        <p:tab title="Previous vacations">
+				            <h:panelGrid columns="2" cellpadding="10" >				                
+				                <h:form id="pastVacTableform" >
+									<p:dataTable id="pastVacTable" var="vacation" value="#{vacationBean.previousVacations}" style="text-align: center; ">
+										<p:column headerText="Status" style="width:120px;">								
+											<h:outputText value="#{vacation.status}" />		               				
+										</p:column>
+										
+										<p:column headerText="Start Date" style="width:75px;">
+											<h:outputText value="#{vacation.startDate}" />
+										</p:column>
+										
+										<p:column headerText="End Date" style="width:75px;">
+											<h:outputText value="#{vacation.endDate}" />																								
+										</p:column>
+										
+										<p:column headerText="Days" style="width:40px;">								
+											<h:outputText value="#{vacation.quantity}" />		               				
+										</p:column>
+										
+										<p:column headerText="Type" style="width:75px;">
+											<h:outputText value="#{vacation.type}" />																		 						
+										</p:column>			
+									</p:dataTable>									
+							    </h:form>
 				            </h:panelGrid>
 				        </p:tab>				        
-				    </p:tabView>	
+				    </p:tabView>
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2" style="border-style: solid; border-width: 1px;" >					
+				<td colspan="2" style="border-style: none;" >					
 					<p:tabView style="width:1300px !important; background-color: #EFFBFB; border-style: none;" >					
 				        <p:tab title="Calendar">
 				            <div style="overflow-x:auto; width: 100%; ">
@@ -263,22 +281,11 @@
 				</td>				
 			</tr>
 			<tr>
-				<td style="border-style: solid; border-width: 1px;">
-					FFF
+				<td style="border-style: none;">
 				</td>
-				<td style="border-style: solid; border-width: 1px;">
-					JJJ
+				<td style="border-style: none;">
 				</td>
-				<td style="border-style: solid; border-width: 1px;">
-					HHH
-				</td>				
 			</tr>
 		</table>
-		
-		<div><h:outputLabel id="targetLabel1" value="===1===" /></div>
-		<div><h:outputLabel id="targetLabel2" value="===2===" /></div>
-					
-				
-		
 	</h:body>     
 </html>

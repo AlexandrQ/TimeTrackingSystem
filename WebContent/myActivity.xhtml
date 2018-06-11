@@ -129,9 +129,7 @@
 	 
 	<h:body>
 	
-		<p:growl id="growl" showDetail="true" life="3000" />  
-		
-								
+		<p:growl id="growl" showDetail="true" life="3000" /> 
 			
 		<div align="right" style="font-size: 10px;">
 			<h:panelGrid columns="6" cellpadding="0" border = "0">
@@ -150,9 +148,9 @@
             </h:panelGrid>
         </div>
 		
-		<table style="width:100%; border-style: solid; border-width: 1px; font-size: 10px;">
+		<table style="width:100%; border-style: none; font-size: 10px;">
 			<tr >
-				<th colspan="2" style="border-style: solid; border-width: 1px;">
+				<th colspan="2" style="border-style: none;">
 					<h:form>
 						<p:tabMenu activeIndex="0">
 							<p:menuitem value="My Activity" url="myActivity.xhtml">
@@ -178,7 +176,7 @@
 				</th>				    
 			</tr>
 			<tr>
-				<td style="border-style: solid; border-width: 1px;">
+				<td style="border-style: none;">
 					<h:form>    
 					    <p:toolbar>
 					        <f:facet name="left">
@@ -203,7 +201,7 @@
 					    </p:toolbar>
 					</h:form>	
 				</td>
-				<td rowspan="2" style="border-style: solid; border-width: 1px; width: 70px;  vertical-align: top;">
+				<td rowspan="2" style="border-style: none; width: 70px;  vertical-align: top;">
 					<h:form>
 			   			<p:calendar id="eventCalendar" value="#{calendarBean.date1}" mode="inline"  beforeShowDay="testMarkDaysFunc" >
 			   				<p:ajax event="dateSelect" listener="#{mainBean.onDateSelect}" update=":tForm:activityTable eventCalendar workDaysLabel vacationLabel sickDaysLabel daysOffLabel" />
@@ -212,7 +210,7 @@
 				</td>				    
 			</tr>
 			<tr>
-				<td style="border-style: solid; width: 85%; border-width: 1px;">
+				<td style="border-style: none; width: 85%;">
 				<h:form id="tForm">
 			    	<p:dataTable id="activityTable" var="activity" value="#{mainBean.activitiesList}" editable="true" >
 			    	
@@ -335,20 +333,13 @@
 				</td>				    				    
 			</tr>
 			<tr>
-			    <td style="border-style: solid; border-width: 1px;">SSS</td>
-			    <td style="border-style: solid; border-width: 1px;">DDD</td>				    				    
+			    <td style="border-style: none;"></td>
+			    <td style="border-style: none;"></td>				    				    
 			</tr>
 			<tr>
-			    <td style="border-style: solid; border-width: 1px;">QQQ</td>
-			    <td style="border-style: solid; border-width: 1px;">RRR</td>				    				    
+			    <td style="border-style: none;"></td>
+			    <td style="border-style: none;"></td>				    				    
 			</tr>
-		</table> 
-		
-		<div><h:outputLabel id="targetLabel1" value="===1===" /></div>
-		<div><h:outputLabel id="targetLabel2" value="===2===" /></div>
-		<div><h:outputLabel id="targetLabel3" value="===3=== " /></div>
-		
-		
-		
+		</table>
 	</h:body>
 </html>
