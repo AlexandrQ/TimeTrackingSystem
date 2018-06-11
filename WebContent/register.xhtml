@@ -35,6 +35,10 @@
 				#{confirmBean.selectUnconfirmedActivies()};
 			}
 			
+			function getTasksPageData(){				
+				#{tasksBean.selectTasksAndGroups()};
+			}
+			
 	</script>	
 </h:head>
  
@@ -70,6 +74,9 @@
 					</p:menuitem>
 					<p:menuitem value="Unconfirmed activity" url="activityConfirmation.xhtml" onclick="getACPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 						<f:param name="i" value="4" />
+					</p:menuitem>
+					<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+						<f:param name="i" value="5" />
 					</p:menuitem>			
 				</p:tabMenu>
 			</td>					    

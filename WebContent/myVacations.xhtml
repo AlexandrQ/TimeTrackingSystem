@@ -31,6 +31,10 @@
 				#{confirmBean.selectUnconfirmedActivies()};
 			}
 			
+			function getTasksPageData(){				
+				#{tasksBean.selectTasksAndGroups()};
+			}
+			
 			
 		</script>
 		<style type="text/css">
@@ -43,7 +47,7 @@
   			 	background-color:#00f7f3;
   			 }
   			 .wd_class {
-  			 	background-color:#00f7f3;
+  			 	background-color:#95D8EF;
   			 }
   			 .vac_class	{
   			 	background-color:#04f700;
@@ -53,6 +57,9 @@
   			 }
   			 .nf_class {
   			 	background-color:#ffffff;
+  			 }
+  			 .do_class {
+  			 	background-color:#F78E45;
   			 }
   			 .ui-datepicker {
   			 	width: 98%;
@@ -71,7 +78,8 @@
 		
 	</h:head>
 	 
-	<h:body>  	
+	<h:body>
+		<p:growl id="growl" showDetail="true" life="4000" />   	
 	 
 		<div align="right" style="font-size: 10px;">
 			<h:panelGrid columns="1" cellpadding="0" border = "0">
@@ -101,6 +109,9 @@
 						</p:menuitem>
 						<p:menuitem value="Unconfirmed activity" url="activityConfirmation.xhtml" onclick="getACPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 							<f:param name="i" value="4" />
+						</p:menuitem>
+						<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+							<f:param name="i" value="5" />
 						</p:menuitem>			
 					</p:tabMenu>
 				</td>					    
@@ -140,20 +151,64 @@
 				</td>
 			</tr>
 			<tr>
-				<td style="border-style: solid; border-width: 1px;">	
+				<td valign="top" style="border-style: solid; border-width: 1px; width:35%">	
 					<p:tabView style="background-color: #EFFBFB; border-style: none;">
 				        <p:tab title="Future vacations">
-				            <h:panelGrid columns="2" cellpadding="10">				                
-				                <h:outputText
-				                    value="The story begins as Don Vito Corleone, the head of a New York Mafia family, oversees his daughter's wedding. 
-				                    His beloved son Michael has just come home from the war, but does not intend to become part of his father's business.
-				                    Through Michael's life the nature of the family business becomes clear. The business of the family is just like the head of the family, kind and benevolent to those who give respect, 
-				                    but given to ruthless violence whenever anything stands against the good of the family." />
+				            <h:panelGrid columns="2" cellpadding="10" >				                
+				                <h:form id="vacTableform" >
+									<p:dataTable id="vacTable" var="vacation" value="#{vacationBean.currentVacations}" editable="true"  style="text-align: center; ">
+										
+										<p:ajax event="rowEdit" listener="#{vacationBean.onRowEdit}" update="growl vacTable" />
+       									<p:ajax event="rowEditCancel" listener="#{vacationBean.onRowCancel}" update="growl" />
+										
+										<p:column headerText="Status" style="width:120px;">								
+											<h:outputText value="#{vacation.status}" />		               				
+										</p:column>
+										
+										<p:column headerText="Start Date" style="width:75px;">
+											<p:cellEditor>
+				               					<f:facet name="output"><h:outputText value="#{vacation.startDate}" /></f:facet>
+				               					<f:facet name="input">
+				               						<p:calendar id="popupCalendarS" value="#{calendarBean.date2}" pattern="yyyy-MM-dd" />
+				               					</f:facet>
+				           					</p:cellEditor>													
+										</p:column>
+										
+										<p:column headerText="End Date" style="width:75px;">
+											<p:cellEditor>
+				               					<f:facet name="output"><h:outputText value="#{vacation.endDate}" /></f:facet>
+				               					<f:facet name="input">
+				               						<p:calendar id="popupCalendarE" value="#{calendarBean.date3}" pattern="yyyy-MM-dd" />
+				               					</f:facet>
+				           					</p:cellEditor>													
+										</p:column>
+										
+										<p:column headerText="Days" style="width:40px;">								
+											<h:outputText value="#{vacation.quantity}" />		               				
+										</p:column>
+										
+										<p:column headerText="Type" style="width:75px;">
+											<p:cellEditor>
+				               					<f:facet name="output"><h:outputText value="#{vacation.type}" /></f:facet>
+				               					<f:facet name="input">               						
+				               						<p:selectOneMenu id="typeInput" value="#{vacation.type}"  var="type">				               													
+														<f:selectItems value="#{vacationBean.typesL}" var="type" itemLabel="#{type}" itemValue="#{type}"/>
+													</p:selectOneMenu>
+				               					</f:facet>
+				           					</p:cellEditor>								 						
+										</p:column>
+															
+										
+										<p:column style="width:32px">
+				           					<p:rowEditor rendered="#{vacation.status != 'Approved'}"/>
+				       					</p:column>
+									</p:dataTable>									
+							    </h:form>
 				            </h:panelGrid>
 				        </p:tab>				        
 				    </p:tabView>
 				</td>
-				<td style="border-style: solid; border-width: 1px;">
+				<td valign="top" style="border-style: solid; border-width: 1px;">
 					<p:tabView style="background-color: #EFFBFB; border-style: none;">
 				        <p:tab title="Past vacations">
 				            <h:panelGrid columns="2" cellpadding="10">				                

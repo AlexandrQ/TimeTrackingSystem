@@ -41,7 +41,8 @@ public class UsersFilter implements Filter {
 		
 		if (session == null || !session.getUser().isLogged()) {
 			if(url.indexOf("/myActivity.xhtml") >= 0 || url.indexOf("/logout.xhtml") >= 0 || url.indexOf("/myVacations.xhtml") >= 0 
-					|| url.indexOf("/register.xhtml") >= 0 || url.indexOf("/projects.xhtml") >= 0 || url.indexOf("/activityConfirmation.xhtml") >= 0 ) {
+					|| url.indexOf("/register.xhtml") >= 0 || url.indexOf("/projects.xhtml") >= 0 
+					|| url.indexOf("/tasks.xhtml") >= 0) {
 				resp.sendRedirect(req.getServletContext().getContextPath() + "/login.xhtml");
 			} else {
 				chain.doFilter(request, response);
@@ -55,6 +56,7 @@ public class UsersFilter implements Filter {
 				req.getSession().removeAttribute("regBean");
 				req.getSession().removeAttribute("projBean");
 				req.getSession().removeAttribute("confirmBean");
+				req.getSession().removeAttribute("tasksBean");
 				resp.sendRedirect(req.getServletContext().getContextPath() + "/login.xhtml");
 			} else {
 				chain.doFilter(request, response);

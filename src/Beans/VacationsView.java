@@ -5,23 +5,25 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.event.RowEditEvent;
 
 import dbCon.SingletonDBConnection;
 import entity.Activity;
 import entity.DaysWeekCls;
 import entity.MonthLength;
 import entity.NDaysCls;
+import entity.Vacation;
 
 @ManagedBean(name = "vacationBean")
 @SessionScoped
@@ -41,10 +43,33 @@ public class VacationsView implements Serializable{
 	private ArrayList<NDaysCls> numbersOfDaysOfWeekYear = new ArrayList<>();
 	private ArrayList<MonthLength> monthLengthList = new ArrayList<>(); 
 	
+	private ArrayList<Vacation> currentVacations  = new ArrayList<>();
+	private ArrayList<String> typesL  = new ArrayList<>();
 	
 	
 	
 	
+	
+
+	public ArrayList<String> getTypesL() {
+		return typesL;
+	}
+
+	public void setTypesL(ArrayList<String> typesL) {
+		this.typesL = typesL;
+	}
+
+	public ArrayList<Vacation> getCurrentVacations() {
+		return currentVacations;
+	}
+
+	public void setCurrentVacations(ArrayList<Vacation> currentVacations) {
+		this.currentVacations = currentVacations;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 
 	public ArrayList<DaysWeekCls> getDaysOfWeekInYear() {
 		return daysOfWeekInYear;
@@ -188,6 +213,8 @@ public class VacationsView implements Serializable{
 	    fillNumberOfDaysAndDaysOfWeek();
 	    fillClasesList();
 	    fillWeekendsList();
+	    fillTypesList();
+	    fillCurrentVacations();
 	    //fillDaysForCalendarHighlighter();
 	}
 	
@@ -201,8 +228,7 @@ public class VacationsView implements Serializable{
 		//получаем из LocalDate номер недели
 		//WeekFields weekFields = WeekFields.of(Locale.getDefault()); 		
 		//selectedWeek = date.get(weekFields.weekOfWeekBasedYear());
-		selectedYear = date.getYear();
-		
+		selectedYear = date.getYear();		
 		 		
 		int numberOfMonth = -1;
 		LocalDate myDate1 = LocalDate.of(date.getYear(), date.getMonth(), date.getDayOfMonth());
@@ -243,9 +269,6 @@ public class VacationsView implements Serializable{
 			}
 			
 			bubbleSortActivitiesListByDate();
-		
-				
-		
 	}
 	
 	//сортирует только определенный лист activitiesListWeek и activitiesListMonth
@@ -323,6 +346,9 @@ public class VacationsView implements Serializable{
 			else if (obj.getType().equals("Sick day")) {
 				classesListYear.add("sck_class");
 			}
+			else if (obj.getType().equals("Day off")) {
+				classesListYear.add("do_class");
+			}
 			else if (obj.getType().equals("Not filled")) {
 				boolean b = true;
 				for(String weekend : weekends) {
@@ -343,6 +369,7 @@ public class VacationsView implements Serializable{
 	}
 	
 	private void fillWeekendsList() {
+		weekends.clear();
 		String queryStrWeekens = "SELECT weekend_date FROM public.weekends";
 		
 		Connection dbConnection = null;
@@ -371,5 +398,89 @@ public class VacationsView implements Serializable{
 		}
 	}
 	
+	private void fillTypesList() {
+		typesL.clear();
+		String queryStrWeekens = "SELECT activity_type_name FROM public.activity_types";
+		
+		Connection dbConnection = null;
+	    Statement statement = null;
+	    ResultSet rsTypes;
+	    
+	    try {
+		    dbConnection = SingletonDBConnection.getInstance().getConnInst();
+		    statement = dbConnection.createStatement();	 
+		    
+		    rsTypes = statement.executeQuery(queryStrWeekens);
+		    
+		    while (rsTypes.next()) {
+		    	typesL.add(rsTypes.getString("activity_type_name"));		    	
+		    }
+	    } catch (SQLException e) {
+		    System.out.println(e.getMessage());	 
+		} finally {
+			if (dbConnection != null) {
+	            try {
+					dbConnection.close();
+				} catch (SQLException e) {				
+					e.printStackTrace();
+				}
+	        }				
+		}
+	}
 	
+	
+	private void fillCurrentVacations() {
+		currentVacations.clear();
+		
+		String queryStrVac = "SELECT vacation_start_date, vacation_end_date, vacation_quantity, user_login, activity_type_name, activity_status_name" + 
+				"	FROM public.vacations, public.users, public.activity_types, public.activity_statuses" + 
+				"    WHERE vacation_user = user_id" + 
+				"    AND vacation_user = (SELECT user_id FROM public.users WHERE user_login = '" + mb.getUser().getLogin() + "')" + 
+				"    AND vacation_type = activity_type_id" + 
+				"    AND vacation_status = activity_status_id";
+		
+		Connection dbConnection = null;
+	    Statement statement = null;
+	    ResultSet rsVac;
+	    
+	    try {
+		    dbConnection = SingletonDBConnection.getInstance().getConnInst();
+		    statement = dbConnection.createStatement();	 
+		    
+		    rsVac = statement.executeQuery(queryStrVac);
+		    
+		    while (rsVac.next()) {
+		    	Vacation vac = new Vacation();		    	 
+		    	
+		    	vac.setStartDate(LocalDate.parse(rsVac.getString("vacation_start_date")));
+		    	vac.setEndDate(LocalDate.parse(rsVac.getString("vacation_end_date")));
+		    	vac.setQuantity(Integer.valueOf(rsVac.getString("vacation_quantity")));
+		    	vac.setStatus(rsVac.getString("activity_status_name"));
+		    	vac.setType(rsVac.getString("activity_type_name"));
+		    	vac.setUser(rsVac.getString("user_login"));		    	
+		    	
+		    	currentVacations.add(vac);		    	
+		    }
+	    } catch (SQLException e) {
+		    System.out.println(e.getMessage());	 
+		} finally {
+			if (dbConnection != null) {
+	            try {
+					dbConnection.close();
+				} catch (SQLException e) {				
+					e.printStackTrace();
+				}
+	        }				
+		}		
+	}
+	
+	public void onRowEdit(RowEditEvent event) {
+		FacesMessage msg = new FacesMessage("onRowEdit", "");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+	}
+	
+	public void onRowCancel(RowEditEvent event) {
+        FacesMessage msg = new FacesMessage("Edit Cancelled", "");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }	
 }

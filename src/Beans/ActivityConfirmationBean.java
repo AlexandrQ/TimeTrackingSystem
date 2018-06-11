@@ -66,15 +66,26 @@ public class ActivityConfirmationBean {
 				"   AND activity_project = project_id" +
 				"   AND activity_status = 3";
 		
+		String queryStrActivitiesNotWD = "SELECT user_login, activity_date, activity_project, activity_percentage, activity_type_name, activity_task_group, activity_task, activity_comment, activity_proportion, activity_status_name" + 
+				"	FROM public.activities, public.users, public.activity_types, public.activity_statuses" + 
+				"    WHERE user_project = (SELECT project_id FROM public.projects WHERE project_name = '" + mb.getUser().getProject() + "')" + 
+				"    AND activity_user = user_id" + 
+				"    AND activity_type = activity_type_id" + 
+				"    AND activity_status = activity_status_id" +
+				"    AND activity_status = 3" +
+				"    AND activity_project is NULL" + 
+				"    AND activity_task_group is NULL" + 
+				"    AND activity_task is NULL";
+		
 		Connection dbConnection = null;
 	    Statement statement = null;
-	    ResultSet rsActivity;
+	    ResultSet rsActivity, rsActivityNotWD;
 		
 		try {				
 		    dbConnection = SingletonDBConnection.getInstance().getConnInst();		    	
 		    statement = dbConnection.createStatement();
-		    rsActivity = statement.executeQuery(queryStrActivities);
-    		
+		    
+		    rsActivity = statement.executeQuery(queryStrActivities);    		
     		while (rsActivity.next()) {    			
     			Activity activity = new Activity(rsActivity.getString("user_login"),
     					rsActivity.getString("activity_date"),
@@ -88,6 +99,19 @@ public class ActivityConfirmationBean {
     					rsActivity.getString("activity_status_name"));	 
     			unconfirmedActivies.add(activity);		    	    			
 		    }
+    		
+    		rsActivityNotWD = statement.executeQuery(queryStrActivitiesNotWD);
+    		while (rsActivityNotWD.next()) {    			
+    			Activity activity = new Activity(rsActivityNotWD.getString("user_login"),
+    					rsActivityNotWD.getString("activity_date"),
+    					rsActivityNotWD.getString("activity_type_name"),
+    					rsActivityNotWD.getString("activity_proportion"),    					
+    					rsActivityNotWD.getString("activity_comment"),
+    					rsActivityNotWD.getString("activity_percentage"),
+    					rsActivityNotWD.getString("activity_status_name"));	 
+    			unconfirmedActivies.add(activity);		    	    			
+		    }
+    		
     		
 		} catch (SQLException e) {
 		    System.out.println(e.getMessage());		    

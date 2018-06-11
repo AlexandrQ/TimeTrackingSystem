@@ -68,6 +68,10 @@
 				#{confirmBean.selectUnconfirmedActivies()};
 			}
 			
+			function getTasksPageData(){				
+				#{tasksBean.selectTasksAndGroups()};
+			}
+			
 			function testMarkDaysFunc(date) {
 				
 				//document.getElementById("targetLabel1").innerHTML += 'Date now : ' + date.setHours(3)  + '###'; 
@@ -165,6 +169,9 @@
 							</p:menuitem>
 							<p:menuitem value="Unconfirmed activity" url="activityConfirmation.xhtml" onclick="getACPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 								<f:param name="i" value="4" />
+							</p:menuitem>
+							<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+								<f:param name="i" value="5" />
 							</p:menuitem>		
 						</p:tabMenu>						
 					</h:form>
@@ -211,7 +218,7 @@
 			    	
 			    		<p:ajax event="rowEdit" listener="#{mainBean.onRowEdit}" update="growl activityTable" />
        					<p:ajax event="rowEditCancel" listener="#{mainBean.onRowCancel}" update="growl" />
-       					<p:ajax event="cellEdit" listener="#{mainBean.onCellEdit}" update="growl"/>
+       					
 			    	
 						<p:column headerText="Date" style="width:80px;">								
 							<h:outputText value="#{activity.date}" />		               				

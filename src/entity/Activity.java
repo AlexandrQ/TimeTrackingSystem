@@ -61,7 +61,7 @@ public class Activity implements Serializable{
 		this.status = status;
 	}
 	
-	public Activity(String date, String type, String proportion, String comment, String percentage,  String status) {
+	public Activity(String user, String date, String type, String proportion, String comment, String percentage,  String status) {
 		super();
 		this.date = date;
 		this.type = type;
@@ -69,6 +69,20 @@ public class Activity implements Serializable{
 		this.comment = comment;
 		this.percentage = percentage;
 		this.status = status;
+		this.user = user;
+		this.project = "";
+		this.task = "";
+		this.taskGroup = "";
+	}
+	
+	public Activity(String date, String type, String proportion, String comment, String percentage,  String status) {
+		super();
+		this.date = date;
+		this.type = type;
+		this.proportion = proportion;				
+		this.comment = comment;
+		this.percentage = percentage;
+		this.status = status;		
 	}
 
 	
