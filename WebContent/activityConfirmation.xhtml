@@ -77,7 +77,10 @@
 					</p:menuitem>
 					<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 						<f:param name="i" value="5" />
-					</p:menuitem>			
+					</p:menuitem>	
+					<p:menuitem value="Statistics" url="reports.xhtml" rendered="#{mainBean.user.role == 'administrator'}">
+						<f:param name="i" value="6" />
+					</p:menuitem>		
 				</p:tabMenu>
 			</td>					    
 		</tr>
@@ -117,8 +120,8 @@
 						</p:column>		
 						
 						<f:facet name="footer">
-		            		<p:commandButton process="unconfirmActTable" update="unconfirmActTable growl" icon="ui-icon-trash" value="Confirm" action="#{confirmBean.confirmActivity()}" >
-		            			<p:confirm header="Confirmation" message="Are you sure that you want to confirm this project?" icon="ui-icon-alert" />
+		            		<p:commandButton process="unconfirmActTable" update="unconfirmActTable growl" icon="ui-icon-circle-check" value="Confirm" action="#{confirmBean.confirmActivity()}" >
+		            			<p:confirm header="Confirmation" message="Are you sure that you want to confirm this activity?" icon="ui-icon-alert" />
 		            		</p:commandButton>
 		            		
 		            		<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">

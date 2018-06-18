@@ -1,0 +1,302 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    >
+ 
+	<h:head>
+		<title>Tasks</title>
+		<style type="text/css">
+				body {
+				    background-color: #EFFBFB;
+				}
+		</style>
+		<script type="text/javascript" language="javascript">
+				
+				function getRegPageData(){				
+					#{regBean.SelectCurrentUsers()};
+				}
+			
+				function getYearActivity(){				
+					#{vacationBean.getCurrentAtivities()};
+				}
+				
+				function getProjPageData(){				
+					#{projBean.SelectCurrentProjects()};
+				}
+				
+				function getACPageData(){				
+					#{confirmBean.selectUnconfirmedActivies()};
+				}
+				
+				function getTasksPageData(){				
+					#{tasksBean.selectTasksAndGroups()};
+				}
+				
+		</script>
+	</h:head>
+	 
+	<h:body>     	
+		
+		<p:growl id="growl"  showDetail="true" life="3000" />
+			
+		<div align="right" style="font-size: 10px;">
+			<h:panelGrid columns="1" cellpadding="0" border = "0">
+				<h:form>
+					<p:menuButton value="#{tasksBean.mb.getUser().getName()}">
+		          		<p:menuitem value="Logout" action="logout.xhtml" url="logout.xhtml" type="submit" update="" style="font-size: 12px;" />	           						                
+		        	</p:menuButton>
+		        </h:form>
+	        </h:panelGrid>
+	    </div>
+	    
+	    <table style="width: 100%; border-style: none; font-size: 10px;">
+			<tr >
+				<td colspan="6" style="border-style: none;">
+					<p:tabMenu activeIndex="5">
+						<p:menuitem value="My Activity" url="myActivity.xhtml">
+							<f:param name="i" value="0" />
+						</p:menuitem>
+						<p:menuitem value="My Vacations" url="myVacations.xhtml" onclick="getYearActivity();">
+							<f:param name="i" value="1" />
+						</p:menuitem>
+						<p:menuitem value="Register user" url="register.xhtml" onclick="getRegPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+							<f:param name="i" value="2" />
+						</p:menuitem>
+						<p:menuitem value="Add project" url="projects.xhtml" onclick="getProjPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+							<f:param name="i" value="3" />
+						</p:menuitem>
+						<p:menuitem value="Unconfirmed activity" url="activityConfirmation.xhtml" onclick="getACPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+							<f:param name="i" value="4" />
+						</p:menuitem>
+						<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+							<f:param name="i" value="5" />
+						</p:menuitem>
+						<p:menuitem value="Statistics" url="reports.xhtml" rendered="#{mainBean.user.role == 'administrator'}">
+							<f:param name="i" value="6" />
+						</p:menuitem>
+									
+					</p:tabMenu>
+				</td>					    
+			</tr>
+			<tr >
+				<td valign="top" style="border-style: none;">
+					<p:tabView id="tV" style="background-color: #e6f2f2; border-style: none;">
+				        <p:tab id="usersInProjectsTab" title="Project staff" align="left">
+				         	<h:form id="btnFrm">
+				         		<p:commandButton id="getRepBtn" update=":tV:form:usersInProjectsTable growl" icon="ui-icon-refresh" value="Refresh table" action="#{reportsBean.getUsersInProjectsReport()}" />
+				         	</h:form>
+				         
+							<h:form id="form">
+								
+								<p:dataTable id="usersInProjectsTable" var="proj" value="#{reportsBean.tbProjects}">
+							        <f:facet name="header">
+							            Project staff data
+							        </f:facet>
+							 
+							        <p:columnGroup type="header">
+							            <p:row>
+							                <p:column headerText="User login" />
+							                <p:column headerText="User name" />
+							                <p:column headerText="User surname" />
+							                <p:column headerText="User position" />
+							                <p:column headerText="User register date" />
+							                <p:column headerText="User degree" />
+							                <p:column headerText="User gender" />
+							            </p:row>						            
+							        </p:columnGroup>
+							 
+							        <p:subTable var="user" value="#{proj.users}">
+							            <f:facet name="header">
+							                <h:outputText value="#{proj.projectName}" />
+							            </f:facet>
+							            <p:column>
+							                <h:outputText value="#{user.login}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.name}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.surname}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.position}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.regDate}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.degree}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.gender}" />
+							            </p:column>
+							            
+							            <p:columnGroup type="footer">
+							                <p:row>
+							                    <p:column footerText="Gender ratio: " style="text-align:right"/>
+							                    <p:column footerText="M - #{proj.males}" />
+							                    <p:column footerText="F - #{proj.females}" />
+							                </p:row>
+							            </p:columnGroup>
+							        </p:subTable>
+							    </p:dataTable>
+						    </h:form>
+				    	</p:tab>
+				    	<p:tab id="usersInDegreesTab" title="Education staff" align="left">
+				         	<h:form id="btnFrmII">
+				         		<p:commandButton id="getDegBtn" update=":tV:formII:usersInDegreesTable growl" icon="ui-icon-refresh" value="Refresh table" action="#{reportsBean.getUsersInDegreesReport()}" />
+				         	</h:form>
+				         
+							<h:form id="formII">
+								
+								<p:dataTable id="usersInDegreesTable" var="degr" value="#{reportsBean.tbDegrees}">
+							        <f:facet name="header">
+							            Education staff data
+							        </f:facet>
+							 
+							        <p:columnGroup type="header">
+							            <p:row>
+							                <p:column headerText="User login" />
+							                <p:column headerText="User name" />
+							                <p:column headerText="User surname" />
+							                <p:column headerText="User position" />
+							                <p:column headerText="User register date" />
+							                <p:column headerText="User project" />
+							                <p:column headerText="User gender" />
+							            </p:row>						            
+							        </p:columnGroup>
+							 
+							        <p:subTable var="user" value="#{degr.users}">
+							            <f:facet name="header">
+							                <h:outputText value="#{degr.degreeName}" />
+							            </f:facet>
+							            <p:column>
+							                <h:outputText value="#{user.login}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.name}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.surname}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.position}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.regDate}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.project}" />
+							            </p:column>
+							            <p:column>
+							                <h:outputText value="#{user.gender}" />
+							            </p:column>
+							            
+							            <p:columnGroup type="footer">
+							                <p:row>
+							                    <p:column footerText="Gender ratio: " style="text-align:right"/>
+							                    <p:column footerText="M - #{degr.males}" />
+							                    <p:column footerText="F - #{degr.females}" />
+							                </p:row>
+							            </p:columnGroup>
+							        </p:subTable>
+							    </p:dataTable>
+						    </h:form>
+				    	</p:tab>
+				    	<p:tab id="hiredStaffTab" title="Hired staff" align="left">
+				    		<h:form id="btnFrmIII">
+				    			<p:inputMask value="#{reportsBean.fromDate}" mask="9999-99-99"/>
+				    			<p:inputMask value="#{reportsBean.toDate}" mask="9999-99-99"/>
+				         		<p:commandButton id="getHiredStaffBtn" update=":tV:formIII:hiredStaffTable :tV:formIV:dismissedStaffTable growl" icon="ui-icon-refresh" value="Refresh tables" action="#{reportsBean.getHuredAndDismissalStaff()}" />
+				         	</h:form>
+				         
+							<h:form id="formIII">								
+								<p:dataTable id="hiredStaffTable" var="user" value="#{reportsBean.hiredStaff}">
+							        <f:facet name="header">
+							            Hired staff from #{reportsBean.fromDate} to #{reportsBean.toDate}
+							        </f:facet>
+							        
+							        <p:column headerText="Login">
+										<h:outputText value="#{user.login}" />			
+									</p:column>
+									<p:column headerText="Name">
+										<h:outputText value="#{user.name}" />			
+									</p:column>
+									<p:column headerText="Surname">
+										<h:outputText value="#{user.surname}" />			
+									</p:column>
+									<p:column headerText="Project">
+										<h:outputText value="#{user.project}" />			
+									</p:column>
+									<p:column headerText="Position">
+										<h:outputText value="#{user.position}" />			
+									</p:column>
+									<p:column headerText="Gender">
+										<h:outputText value="#{user.gender}" />			
+									</p:column>
+									<p:column headerText="Degree">
+										<h:outputText value="#{user.degree}" />			
+									</p:column>
+									<p:column headerText="Register date">
+										<h:outputText value="#{user.regDate}" />			
+									</p:column>
+									<p:column headerText="Dismissal date">
+										<h:outputText value="#{user.dismissalDate}" />			
+									</p:column>	
+							        
+							    </p:dataTable>
+						    </h:form>
+						    
+						    <h:form id="formIV">								
+								<p:dataTable id="dismissedStaffTable" var="user" value="#{reportsBean.dismissedStaff}">
+							        <f:facet name="header">
+							            Dismissed staff from #{reportsBean.fromDate} to #{reportsBean.toDate}
+							        </f:facet>
+							        
+							        <p:column headerText="Login">
+										<h:outputText value="#{user.login}" />			
+									</p:column>
+									<p:column headerText="Name">
+										<h:outputText value="#{user.name}" />			
+									</p:column>
+									<p:column headerText="Surname">
+										<h:outputText value="#{user.surname}" />			
+									</p:column>
+									<p:column headerText="Project">
+										<h:outputText value="#{user.project}" />			
+									</p:column>
+									<p:column headerText="Position">
+										<h:outputText value="#{user.position}" />			
+									</p:column>
+									<p:column headerText="Gender">
+										<h:outputText value="#{user.gender}" />			
+									</p:column>
+									<p:column headerText="Degree">
+										<h:outputText value="#{user.degree}" />			
+									</p:column>
+									<p:column headerText="Register date">
+										<h:outputText value="#{user.regDate}" />			
+									</p:column>
+									<p:column headerText="Dismissal date">
+										<h:outputText value="#{user.dismissalDate}" />			
+									</p:column>	
+							        
+							    </p:dataTable>
+						    </h:form>
+				    	</p:tab>
+				    	<p:tab id="yearsInCompanyTab" title="Years in company" align="left">	
+				    	</p:tab>			        
+				    </p:tabView>
+				</td>
+			</tr>
+		</table>
+	</h:body>
+	     
+</html>

@@ -77,6 +77,9 @@
 					</p:menuitem>
 					<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 						<f:param name="i" value="5" />
+					</p:menuitem>
+					<p:menuitem value="Statistics" url="reports.xhtml" rendered="#{mainBean.user.role == 'administrator'}">
+						<f:param name="i" value="6" />
 					</p:menuitem>			
 				</p:tabMenu>
 			</td>					    

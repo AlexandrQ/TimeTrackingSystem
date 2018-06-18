@@ -112,7 +112,10 @@
 						</p:menuitem>
 						<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 							<f:param name="i" value="5" />
-						</p:menuitem>			
+						</p:menuitem>	
+						<p:menuitem value="Statistics" url="reports.xhtml" rendered="#{mainBean.user.role == 'administrator'}">
+							<f:param name="i" value="6" />
+						</p:menuitem>		
 					</p:tabMenu>
 				</td>					    
 			</tr>
@@ -151,7 +154,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td valign="top" style="border-style: none; width:35%">	
+				<td valign="top" style="border-style: none; width:40%">	
 					<p:tabView style="background-color: #EFFBFB; border-style: none;">
 				        <p:tab title="Future vacations">
 				            <h:panelGrid columns="2" cellpadding="10" >				                
@@ -169,7 +172,7 @@
 											<p:cellEditor>
 				               					<f:facet name="output"><h:outputText value="#{vacation.startDate}" /></f:facet>
 				               					<f:facet name="input">
-				               						<p:calendar id="popupCalendarS" value="#{calendarBean.date2}" pattern="yyyy-MM-dd" />
+				               						<p:inputMask value="#{vacation.startDate}" mask="9999-99-99"/>
 				               					</f:facet>
 				           					</p:cellEditor>													
 										</p:column>
@@ -178,7 +181,7 @@
 											<p:cellEditor>
 				               					<f:facet name="output"><h:outputText value="#{vacation.endDate}" /></f:facet>
 				               					<f:facet name="input">
-				               						<p:calendar id="popupCalendarE" value="#{calendarBean.date3}" pattern="yyyy-MM-dd" />
+				               						<p:inputMask value="#{vacation.endDate}" mask="9999-99-99"/>
 				               					</f:facet>
 				           					</p:cellEditor>													
 										</p:column>
@@ -208,7 +211,7 @@
 				        </p:tab>				        
 				    </p:tabView>
 				</td>
-				<td valign="top" style="border-style: none; width:35%">	
+				<td valign="top" style="border-style: none; width:40%">	
 					<p:tabView style="background-color: #EFFBFB; border-style: none;">
 				        <p:tab title="Previous vacations">
 				            <h:panelGrid columns="2" cellpadding="10" >				                
@@ -242,10 +245,10 @@
 			</tr>
 			<tr>
 				<td colspan="2" style="border-style: none;" >					
-					<p:tabView style="width:1300px !important; background-color: #EFFBFB; border-style: none;" >					
+					<p:tabView style="width:1700px !important; background-color: #EFFBFB; border-style: none;" >					
 				        <p:tab title="Calendar">
 				            <div style="overflow-x:auto; width: 100%; ">
-								<table border="1" style="text-align: center; border-style: none; border-collapse: collapse" bordercolor="#DCDCDC">
+								<table id="CalendarTable" border="1" style="text-align: center; border-style: none; border-collapse: collapse" bordercolor="#DCDCDC">
 									<tr>
 			            				<ui:repeat value="#{vacationBean.monthLengthList}" var="data4" >			            					
 					                		<td colspan="#{data4.length}" style="width: 750px; height: 20px; font-size: 10px; background-color: #2E9AFE; color: white;">

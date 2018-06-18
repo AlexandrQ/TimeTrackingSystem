@@ -445,6 +445,7 @@ public class VacationsView implements Serializable{
 	
 	private void fillCurrentVacations() {
 		currentVacations.clear();
+		currentVacations.add(new Vacation());
 		
 		String queryStrVac = "SELECT vacation_start_date, vacation_end_date, vacation_quantity, user_login, activity_type_name, activity_status_name" + 
 				"	FROM public.vacations, public.users, public.activity_types, public.activity_statuses" + 
@@ -467,8 +468,8 @@ public class VacationsView implements Serializable{
 		    while (rsVac.next()) {
 		    	Vacation vac = new Vacation();		    	 
 		    	
-		    	vac.setStartDate(LocalDate.parse(rsVac.getString("vacation_start_date")));
-		    	vac.setEndDate(LocalDate.parse(rsVac.getString("vacation_end_date")));
+		    	vac.setStartDate(rsVac.getString("vacation_start_date"));
+		    	vac.setEndDate(rsVac.getString("vacation_end_date"));
 		    	vac.setQuantity(Integer.valueOf(rsVac.getString("vacation_quantity")));
 		    	vac.setStatus(rsVac.getString("activity_status_name"));
 		    	vac.setType(rsVac.getString("activity_type_name"));
@@ -486,7 +487,8 @@ public class VacationsView implements Serializable{
 					e.printStackTrace();
 				}
 	        }				
-		}		
+		}	
+	    
 	}
 	
 	private void fillPreviosVacations() {
@@ -513,8 +515,8 @@ public class VacationsView implements Serializable{
 		    while (rsVac.next()) {
 		    	Vacation vac = new Vacation();		    	 
 		    	
-		    	vac.setStartDate(LocalDate.parse(rsVac.getString("vacation_start_date")));
-		    	vac.setEndDate(LocalDate.parse(rsVac.getString("vacation_end_date")));
+		    	vac.setStartDate(rsVac.getString("vacation_start_date"));
+		    	vac.setEndDate(rsVac.getString("vacation_end_date"));
 		    	vac.setQuantity(Integer.valueOf(rsVac.getString("vacation_quantity")));
 		    	vac.setStatus(rsVac.getString("activity_status_name"));
 		    	vac.setType(rsVac.getString("activity_type_name"));
@@ -536,8 +538,97 @@ public class VacationsView implements Serializable{
 	}
 	
 	public void onRowEdit(RowEditEvent event) {
-		FacesMessage msg = new FacesMessage("onRowEdit", "");
+		
+		Vacation vac = (Vacation)event.getObject();
+		String countQuery = "SELECT COUNT(activity_id) AS Count FROM public.activities " + 
+				"WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + mb.getUser().getLogin() + "') " + 
+				"AND activity_date BETWEEN '" + vac.getStartDate() + "' AND '" + vac.getEndDate() + "'";	
+		
+		String activityInsertQuery = "";
+		
+		Connection dbConnection = null;
+	    Statement statement = null;
+	    ResultSet rsCount;
+		
+	    try {
+		    dbConnection = SingletonDBConnection.getInstance().getConnInst();
+		    statement = dbConnection.createStatement();	 		    
+		    
+		    rsCount = statement.executeQuery(countQuery);
+		    
+		    if (rsCount.next()) {			    	
+		    	if(rsCount.getString("Count").equals("0") ) {
+		    		int quantity = 1;
+		    		LocalDate startD, endD;
+		    		startD = LocalDate.parse(vac.getStartDate());
+		    		endD = LocalDate.parse(vac.getEndDate());		    		
+		    		if(startD.isBefore(endD)) {
+		    			while (startD.isBefore(endD)) {		    				
+			    			activityInsertQuery = "INSERT INTO public.activities(" + 
+			    					"	activity_user, activity_date, activity_percentage, activity_type, activity_proportion, activity_status)" + 
+			    					"	VALUES ((SELECT user_id FROM public.users WHERE user_login = '" + mb.getUser().getLogin() + "')," + 
+			    					"            '" + startD.toString() + "', 100," + 
+			    					"            (SELECT activity_type_id FROM public.activity_types WHERE activity_type_name = '" + vac.getType() + "'), 1, 4)";
+			    			
+			    			if (statement.executeUpdate(activityInsertQuery) != 1) {
+			    				FacesMessage msg = new FacesMessage("Error", "Update was unsuccessful");
+					            FacesContext.getCurrentInstance().addMessage(null, msg);
+					            return;
+			    			}			    			
+			    			startD = startD.plusDays(1);
+			    			quantity++;
+			    		}
+		    		}
+		    		
+		    		activityInsertQuery = "INSERT INTO public.activities(" + 
+	    					"	activity_user, activity_date, activity_percentage, activity_type, activity_proportion, activity_status)" + 
+	    					"	VALUES ((SELECT user_id FROM public.users WHERE user_login = '" + mb.getUser().getLogin() + "')," + 
+	    					"            '" + startD.toString() + "', 100," + 
+	    					"            (SELECT activity_type_id FROM public.activity_types WHERE activity_type_name = '" + vac.getType() + "'), 1, 4)";
+	    			
+	    			if (statement.executeUpdate(activityInsertQuery) != 1) {
+	    				FacesMessage msg = new FacesMessage("Error", "Activity update was unsuccessful");
+			            FacesContext.getCurrentInstance().addMessage(null, msg);
+			            return;
+	    			}
+	    			
+	    			String vacInsertQuery = "INSERT INTO public.vacations(" + 
+	    					"	vacation_start_date, vacation_end_date, vacation_quantity, vacation_user, vacation_type, vacation_status) " + 
+	    					"	VALUES ('" + vac.getStartDate() + "', '" + vac.getEndDate() + "', " + quantity + 
+	    					", (SELECT user_id FROM public.users WHERE user_login = '" + mb.getUser().getLogin() + "'), " + 
+	    					"(SELECT activity_type_id FROM public.activity_types WHERE activity_type_name = '" + vac.getType() + "'), 4);";
+	    			
+	    			if (statement.executeUpdate(vacInsertQuery) != 1) {
+	    				FacesMessage msg = new FacesMessage("Error", "Vacation update was unsuccessful");
+			            FacesContext.getCurrentInstance().addMessage(null, msg);
+			            return;
+	    			}
+		    		
+			    }
+		    	else {
+		    		FacesMessage msg = new FacesMessage("onRowEdit", "Selected period must be empty.");
+		            FacesContext.getCurrentInstance().addMessage(null, msg);
+		            return;
+		    	}
+		    }	    
+	    } catch (SQLException e) {
+		    System.out.println(e.getMessage());	 
+		    FacesMessage msg = new FacesMessage("Error", "Update was unsuccessful: " + e.getMessage());
+	        FacesContext.getCurrentInstance().addMessage(null, msg);
+		    return;
+		} finally {
+			if (dbConnection != null) {
+	            try {
+					dbConnection.close();
+				} catch (SQLException e) {				
+					e.printStackTrace();
+				}
+	        }				
+		}	
+		
+		FacesMessage msg = new FacesMessage("OK", "Update was successful");
         FacesContext.getCurrentInstance().addMessage(null, msg);
+        getCurrentAtivities();
 	}
 	
 	public void onRowCancel(RowEditEvent event) {

@@ -78,7 +78,9 @@
 					<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 						<f:param name="i" value="5" />
 					</p:menuitem>
-								
+					<p:menuitem value="Statistics" url="reports.xhtml" rendered="#{mainBean.user.role == 'administrator'}">
+						<f:param name="i" value="6" />
+					</p:menuitem>								
 				</p:tabMenu>
 			</td>					    
 		</tr>
@@ -115,7 +117,7 @@
 								
 								<f:facet name="footer">
 				            		<p:commandButton process="tasksTable" update="tasksTable growl" icon="ui-icon-trash" value="Delete" action="#{tasksBean.deleteTask()}" >
-				            			<p:confirm header="Confirmation" message="Are you sure that you want to delete this project?" icon="ui-icon-alert" />
+				            			<p:confirm header="Confirmation" message="Are you sure that you want to delete this task?" icon="ui-icon-alert" />
 				            		</p:commandButton>
 				            		
 				            		<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
@@ -163,7 +165,7 @@
 								
 								<f:facet name="footer">
 				            		<p:commandButton process="taskGroupsTable" update="taskGroupsTable growl" icon="ui-icon-trash" value="Delete" action="#{tasksBean.deleteTaskGroup()}" >
-				            			<p:confirm header="Confirmation" message="Are you sure that you want to delete this project?" icon="ui-icon-alert" />
+				            			<p:confirm header="Confirmation" message="Are you sure that you want to delete this task group?" icon="ui-icon-alert" />
 				            		</p:commandButton>
 				            		
 				            		<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">

@@ -195,14 +195,14 @@ public class TasksBean implements Serializable {
 		
 		if(checkTaskGroupDuplicate()) {
 			if(createTaskGroup()) {					
-				msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Task was created successful", "");
+				msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Task group was created successful", "");
 				newTaskGroup = "";
 				selectCurrentTaskGroups();
 			} else {					
 				msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Error!", "");
 			}			
 		} else {				
-			msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Error!", "Task already exists");			
+			msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Error!", "Task group already exists");			
 		}
 		
         FacesContext.getCurrentInstance().addMessage(null, msg);       

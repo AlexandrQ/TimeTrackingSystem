@@ -287,7 +287,7 @@ public class RegisterBean {
 	public void disableUser() {
 		
 		FacesMessage msg = null;
-		String queryStrDelete = "UPDATE public.users SET user_status=2 WHERE user_login='" + selectedUser.getLogin() + "';";
+		String queryStrDelete = "UPDATE public.users SET user_status=2, user_dismissal_date='" + LocalDate.now() + "' WHERE user_login='" + selectedUser.getLogin() + "';";
 		
 		Connection dbConnection = null;
 		Statement statement = null;
@@ -326,7 +326,7 @@ public class RegisterBean {
 	public void enableUser() {
 		
 		FacesMessage msg = null;
-		String queryStrDelete = "UPDATE public.users SET user_status=1 WHERE user_login='" + selectedUser.getLogin() + "';";
+		String queryStrDelete = "UPDATE public.users SET user_status=1, user_register_date='" + LocalDate.now() + "', user_dismissal_date=null   WHERE user_login='" + selectedUser.getLogin() + "';";
 		
 		Connection dbConnection = null;
 		Statement statement = null;

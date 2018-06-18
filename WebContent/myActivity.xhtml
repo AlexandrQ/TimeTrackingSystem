@@ -20,7 +20,7 @@
 				/*background-color: #dd1193;			*/	
 				/* font-size: 100%; */
 				width: 80px;
-				height: 35px;
+				height: 35px;				
 			}
 			.ui-datepicker {
   			 	width: 98%;  			 	
@@ -29,7 +29,8 @@
   			 	height: 100%;
   			 }
 			.workDaycss {
-				background-color: #00ffff;
+				background-color: #87d3f2;
+				
 			}
 			.vacationDaycss {
 				background-color: #02ce24;
@@ -170,6 +171,9 @@
 							</p:menuitem>
 							<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 								<f:param name="i" value="5" />
+							</p:menuitem>
+							<p:menuitem value="Statistics" url="reports.xhtml" rendered="#{mainBean.user.role == 'administrator'}">
+								<f:param name="i" value="6" />
 							</p:menuitem>		
 						</p:tabMenu>						
 					</h:form>

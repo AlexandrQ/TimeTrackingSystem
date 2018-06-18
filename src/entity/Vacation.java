@@ -1,11 +1,20 @@
 package entity;
 
-import java.time.LocalDate;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
-public class Vacation {
+
+public class Vacation implements Serializable{
 	
-	private LocalDate startDate;
-	private LocalDate endDate;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String startDate;
+	private String endDate;
 	private String user;
 	private String type;
 	private String status;
@@ -20,17 +29,18 @@ public class Vacation {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public LocalDate getStartDate() {
+	public String getStartDate() {
 		return startDate;
 	}
-	public void setStartDate(LocalDate startDate) {
-		this.startDate = startDate;
+	public void setStartDate(String startDate) {		
+			this.startDate = startDate;
 	}
-	public LocalDate getEndDate() {
+	
+	public String getEndDate() {
 		return endDate;
 	}
-	public void setEndDate(LocalDate endDate) {
-		this.endDate = endDate;
+	public void setEndDate(String endDate) {		
+		this.endDate = endDate;		
 	}
 	public String getUser() {
 		return user;
@@ -51,7 +61,25 @@ public class Vacation {
 		this.quantity = quantity;
 	}
 	
+	public Vacation(){
+		
+	}
 	
+	public Vacation(String SD, String ED, String typeV){
+		super();
+		this.startDate = SD;
+		this.endDate = ED;
+		this.type = typeV;
+	}
+	
+	public Vacation(String Status, String SD, String ED, String days, String typeV){
+		super();
+		this.startDate = SD;
+		this.endDate = ED;
+		this.type = typeV;
+		this.status = Status;
+		this.quantity = Integer.valueOf(days);
+	}
 	
 	
 }
