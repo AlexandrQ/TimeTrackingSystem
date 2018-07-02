@@ -175,8 +175,7 @@ public class MainBean implements Serializable{
 	}
 
 	public ArrayList<Activity> getActivitiesList() {
-		if(activitiesList==null){
-			System.out.println("(My comment) getActivitiesList()->activitiesList==null");
+		if(activitiesList==null){			
 			getCurrentAtivities(LocalDate.now());
 	    }	    
 		return activitiesList;
@@ -417,10 +416,6 @@ public class MainBean implements Serializable{
 		
 		Collections.sort(daysInSelectedWeek);
 		
-		for (int i = 0; i < daysInSelectedWeek.size(); i++) {
-			System.out.println("(My comment) ArrayWeek: " + daysInSelectedWeek.get(i) );
-		}
-		
 		return daysInSelectedWeek;
 	}
 	
@@ -452,10 +447,6 @@ public class MainBean implements Serializable{
 		}
 		
 		Collections.sort(daysInSelectedMonth);
-		
-		for (int i = 0; i < daysInSelectedMonth.size(); i++) {
-			System.out.println("(My comment) ArrayMonth: " + daysInSelectedMonth.get(i) );
-		}
 		
 		return daysInSelectedMonth;
 	}
@@ -565,26 +556,16 @@ public class MainBean implements Serializable{
 			}
 			
 		}
-		System.out.println("(My comment) fillDaysForCalendarHighlighter->workDaysForCalendar : " + workDaysForCalendar.toString() );
-		System.out.println("(My comment) fillDaysForCalendarHighlighter->vacationDaysForCalendar : " + vacationDaysForCalendar.toString() );
-		System.out.println("(My comment) fillDaysForCalendarHighlighter->sickDaysForCalendar : " + sickDaysForCalendar.toString() );
-		System.out.println("(My comment) fillDaysForCalendarHighlighter->daysOffForCalendar : " + daysOffForCalendar.toString() );
-		/*for (int i = 0; i < workDaysForCalendar.size(); i++) {
-			System.out.println("(My comment) fillDaysForCalendarHighlighter->workDaysForCalendar[i] : " + workDaysForCalendar.get(i));
-		}*/
-		
 	}
 	
 	
 	public void onDateSelect(SelectEvent event) {
-		System.out.println("(My comment) onDateSelect->SelectEvent");
 		
 		//получаем выбранную дату из event
 		Date date = (Date) event.getObject();	
 		
 		//преобразуем Date в LocalDate
-		LocalDate dd = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();		
-		System.out.println("(My comment) onDateSelect->LocalDate: " + dd);
+		LocalDate dd = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();	
 		
 		getCurrentAtivities(dd);
 	}
@@ -599,62 +580,7 @@ public class MainBean implements Serializable{
 		lengthOfCurrentActivitiesList = "month";
 		getCurrentAtivities(LocalDate.now());
 	}
-	
-	 /*public void onRowEdit(RowEditEvent event) {
-		Activity obj = (Activity) event.getObject();
-		FacesMessage msg;
-		if (obj.getType() == null) {
-			msg = new FacesMessage("Activity Edited", obj.getDate() + " New day" );
-		}
-		else {
-			if (!obj.getStatus().equals("Approved")) {
-				msg = new FacesMessage("Activity Edited", obj.getComment() + " Update object"  );
-				
-				/*String queryStrUpdate = "UPDATE public.activities" + 
-						"	SET activity_percentage="+ obj.getPercentage() == null ? "" : obj.getPercentage() +" ," + 
-						"        activity_type=(SELECT activity_type_id FROM public.activity_types WHERE activity_type_name = '" + obj.getType() + "' )," + 
-						"        activity_comment = '"+ obj.getComment() == null ? "" : obj.getComment() +"', " + 
-						"        activity_proportion = " + obj.getProportion() + ", " + 
-						"        activity_status = 3" + 
-						"	WHERE activity_user = (SELECT user_id FROM public.users WHERE user_login = '" + user.getLogin() +"' )" + 
-						"    AND activity_date = '" + obj.getDate() +"'";
-				
-				Connection dbConnection = null;
-				Statement statement = null;
-				    
-			    try {
-				    dbConnection = SingletonDBConnection.getInstance().getConnInst();
-				    statement = dbConnection.createStatement();		
-				    
-				    if (!(statement.executeUpdate(queryStrUpdate) == 1)) {
-				    	System.out.println("(My comment: Update unsuccessful)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"); 
-				    	
-				    }
-				    
-				    if (dbConnection != null) {
-				    	dbConnection.close();	
-				    }				
-				    
-				} catch (SQLException e) {
-				    System.out.println(e.getMessage());	
-				    
-				    if (dbConnection != null) {
-			            try {
-							dbConnection.close();
-						} catch (SQLException ee) {				
-							ee.printStackTrace();
-						}		            
-			        }	
-				} 
-			}
-			else {
-				msg = new FacesMessage("Edit", "Cannot edited this activity"  );
-			}
-			
-		}
-        
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-    }*/
+	 
 	
 	public void onRowEdit(RowEditEvent event) {
 	

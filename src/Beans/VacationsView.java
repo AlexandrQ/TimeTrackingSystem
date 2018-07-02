@@ -5,13 +5,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -151,9 +147,8 @@ public class VacationsView implements Serializable{
 	public void getCurrentAtivities() {		
 		
 		LocalDate date = LocalDate.now();
-		activitiesListYear.clear();	
+		activitiesListYear.clear();			
 		
-		String str = date.getDayOfWeek().toString();
 		ArrayList<LocalDate> daysInSelectedYear = fillDaysInSelectedYear(date);			
 		
 		String queryStrMonth = "SELECT activity_date, project_name,  activity_proportion,  activity_type_name, activity_task_group_name, activity_task_name, activity_comment, activity_percentage, activity_status_name" + 
@@ -259,10 +254,6 @@ public class VacationsView implements Serializable{
 		}
 		
 		Collections.sort(daysInSelectedYear);
-		
-		for (int i = 0; i < daysInSelectedYear.size(); i++) {
-			System.out.println("(My comment) ArrayYear: " + daysInSelectedYear.get(i) );
-		}
 		
 		return daysInSelectedYear;
 	}

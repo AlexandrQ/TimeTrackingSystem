@@ -95,25 +95,25 @@
 			<tr >
 				<td colspan="3" style="border-style: none;">
 					<p:tabMenu activeIndex="1">
-						<p:menuitem value="My Activity" url="myActivity.xhtml">
+						<p:menuitem value="My Activity" url="myActivity.xhtml" rendered="#{mainBean.user.role != 'administrator'}">
 							<f:param name="i" value="0" />
 						</p:menuitem>
-						<p:menuitem value="My Vacations" url="myVacations.xhtml" onclick="getYearActivity();">
+						<p:menuitem value="My Vacations" url="myVacations.xhtml" onclick="getYearActivity();" rendered="#{mainBean.user.role != 'administrator'}" >
 							<f:param name="i" value="1" />
-						</p:menuitem>
+						</p:menuitem>	
 						<p:menuitem value="Register user" url="register.xhtml" onclick="getRegPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 							<f:param name="i" value="2" />
 						</p:menuitem>
 						<p:menuitem value="Add project" url="projects.xhtml" onclick="getProjPageData();" rendered="#{mainBean.user.role == 'administrator'}">
 							<f:param name="i" value="3" />
 						</p:menuitem>
-						<p:menuitem value="Unconfirmed activity" url="activityConfirmation.xhtml" onclick="getACPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+						<p:menuitem value="Unconfirmed activity" url="activityConfirmation.xhtml" onclick="getACPageData();" rendered="#{mainBean.user.role == 'manager'}">
 							<f:param name="i" value="4" />
 						</p:menuitem>
-						<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'administrator'}">
+						<p:menuitem value="Tasks" url="tasks.xhtml" onclick="getTasksPageData();" rendered="#{mainBean.user.role == 'manager'}">
 							<f:param name="i" value="5" />
-						</p:menuitem>	
-						<p:menuitem value="Statistics" url="reports.xhtml" rendered="#{mainBean.user.role == 'administrator'}">
+						</p:menuitem>
+						<p:menuitem value="Statistics" url="reports.xhtml" rendered="#{mainBean.user.role == 'hr'}">
 							<f:param name="i" value="6" />
 						</p:menuitem>		
 					</p:tabMenu>
@@ -245,7 +245,7 @@
 			</tr>
 			<tr>
 				<td colspan="2" style="border-style: none;" >					
-					<p:tabView style="width:1700px !important; background-color: #EFFBFB; border-style: none;" >					
+					<p:tabView style="width:1200px !important; background-color: #EFFBFB; border-style: none;" >					
 				        <p:tab title="Calendar">
 				            <div style="overflow-x:auto; width: 100%; ">
 								<table id="CalendarTable" border="1" style="text-align: center; border-style: none; border-collapse: collapse" bordercolor="#DCDCDC">
